@@ -1,13 +1,16 @@
 package com.aliware.tianchi;
 
+import com.aliware.tianchi.util.Access;
+import com.aliware.tianchi.util.MsgCounter;
 import org.apache.dubbo.rpc.listener.CallbackListener;
+import org.apache.dubbo.rpc.protocol.dubbo.status.ThreadPoolStatusChecker;
 import org.apache.dubbo.rpc.service.CallbackService;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author daofeng.xjf
@@ -19,33 +22,34 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CallbackServiceImpl implements CallbackService {
 
     public CallbackServiceImpl() {
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (!listeners.isEmpty()) {
-                    for (Map.Entry<String, CallbackListener> entry : listeners.entrySet()) {
-                        try {
-                            entry.getValue().receiveServerMsg(System.getProperty("quota") + " " + new Date().toString());
-                        } catch (Throwable t1) {
-                            listeners.remove(entry.getKey());
-                        }
-                    }
-                }
-            }
-        }, 0, 5000);
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                if (callbackListener != null) {
+//                    try {
+//                        callbackListener.receiveServerMsg(System.getProperty("quota") + " ");
+//                    } catch (Throwable t1) {
+//                        t1.printStackTrace();
+//                    }
+//                }
+//            }
+//        }, 0, 1000);
     }
 
-    private Timer timer = new Timer();
+//    private Timer timer = new Timer();
 
     /**
      * key: listener type
      * value: callback listener
      */
-    private final Map<String, CallbackListener> listeners = new ConcurrentHashMap<>();
+//    private final Map<String, CallbackListener> listeners = new ConcurrentHashMap<>();
+
+    private ThreadPoolStatusChecker checker = new ThreadPoolStatusChecker();
 
     @Override
     public void addListener(String key, CallbackListener listener) {
-        listeners.put(key, listener);
-        listener.receiveServerMsg(new Date().toString()); // send notification for change
+        Access.listener = listener;
+        String msg = checker.check().getMessage();
+        listener.receiveServerMsg(System.getProperty("quota") + " " + msg.substring(msg.indexOf("max:")+4, msg.indexOf(", core")));
     }
 }

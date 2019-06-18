@@ -1,6 +1,9 @@
 package com.aliware.tianchi;
 
+import com.aliware.tianchi.remote.Access;
 import org.apache.dubbo.rpc.listener.CallbackListener;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author daofeng.xjf
@@ -11,10 +14,19 @@ import org.apache.dubbo.rpc.listener.CallbackListener;
  *
  */
 public class CallbackListenerImpl implements CallbackListener {
-
+    AtomicInteger cnt = new AtomicInteger();
+    volatile boolean flag = true;
     @Override
     public void receiveServerMsg(String msg) {
-        System.out.println("receive msg from server :" + msg);
+        if(flag && msg.contains(" ")) {
+            String[] strs = msg.split(" ");
+            Access.queue.initSize(strs[0], Integer.valueOf(strs[1]));
+            if(cnt.getAndIncrement() == 3)
+                flag = false;
+        } else {
+//            long duration = System.currentTimeMillis();
+            Access.queue.put(msg);
+//            System.out.println(System.currentTimeMillis() - duration);
+        }
     }
-
 }

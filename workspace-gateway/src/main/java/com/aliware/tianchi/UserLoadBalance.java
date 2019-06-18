@@ -1,9 +1,12 @@
 package com.aliware.tianchi;
 
+import com.aliware.tianchi.remote.Access;
+import com.aliware.tianchi.remote.InvokerQueue;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.RpcException;
+import org.apache.dubbo.rpc.RpcStatus;
 import org.apache.dubbo.rpc.cluster.LoadBalance;
 
 import java.util.List;
@@ -21,6 +24,19 @@ public class UserLoadBalance implements LoadBalance {
 
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
+        if("addListener".equals(invocation.getMethodName()))
+            return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
+        String target = Access.queue.get();
+        if(target != null) {
+//            System.out.println("choose:" + target);
+            for (int i = 0; i < invokers.size(); i++) {
+                Invoker<T> invoker = invokers.get(i);
+                if (target.equals(invoker.getUrl().getHost().substring(9))) {
+                    return invoker;
+                }
+                //            int activeCount = RpcStatus.getStatus(invoker.getUrl(), invocation.getMethodName()).getActive();
+            }
+        }
         return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
     }
 }
