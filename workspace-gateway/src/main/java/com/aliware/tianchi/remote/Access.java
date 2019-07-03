@@ -1,5 +1,7 @@
 package com.aliware.tianchi.remote;
 
+import java.util.Map;
+
 public class Access {
-    public static InvokerQueue queue = new InvokerQueue();
+    public static Map<String, Status> providerMap;
 }

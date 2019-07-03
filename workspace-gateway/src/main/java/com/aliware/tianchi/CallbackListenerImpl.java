@@ -14,19 +14,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  */
 public class CallbackListenerImpl implements CallbackListener {
-    AtomicInteger cnt = new AtomicInteger();
-    volatile boolean flag = true;
     @Override
     public void receiveServerMsg(String msg) {
-        if(flag && msg.contains(" ")) {
+        if(msg.contains(" ")) {
             String[] strs = msg.split(" ");
-            Access.queue.initSize(strs[0], Integer.valueOf(strs[1]));
-            if(cnt.getAndIncrement() == 3)
-                flag = false;
-        } else {
-//            long duration = System.currentTimeMillis();
-            Access.queue.put(msg);
-//            System.out.println(System.currentTimeMillis() - duration);
+            Access.providerMap.get(strs[0]).release(Double.valueOf(strs[1]));
         }
     }
 }

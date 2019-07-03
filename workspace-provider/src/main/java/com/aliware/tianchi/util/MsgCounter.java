@@ -1,16 +1,28 @@
 package com.aliware.tianchi.util;
 
-import java.util.concurrent.atomic.AtomicLong;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MsgCounter {
-    private static AtomicLong activeMsgCnt = new AtomicLong();
-    private static AtomicLong sentMsgCnt = new AtomicLong();
+    public static int BatchSize = 64;
+    private volatile double[] duration = new double[BatchSize];
+    private static AtomicInteger cnt  = new AtomicInteger();
+    private String quota = System.getProperty("quota");
 
-    public static AtomicLong getActiveMsgCnt() {
-        return activeMsgCnt;
+    public void callback() {
+        double res = 0;
+        for(double d : duration) res += d;
+        String msg = quota + " " + res / BatchSize;
+        System.out.println(msg);
+        Access.listener.receiveServerMsg(msg);
     }
 
-    public static AtomicLong getSentMsgCnt() {
-        return sentMsgCnt;
+    public void add(double duration) {
+        int pos = cnt.getAndIncrement();
+        if(pos == BatchSize) {
+            callback();
+            cnt.set(0);
+        }
+        this.duration[pos % BatchSize] = duration;
     }
 }

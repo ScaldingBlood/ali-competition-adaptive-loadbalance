@@ -21,20 +21,16 @@ import java.util.concurrent.ThreadLocalRandom;
  * 选手需要基于此类实现自己的负载均衡算法
  */
 public class UserLoadBalance implements LoadBalance {
+    private InvokerQueue queue = new InvokerQueue();
 
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         if("addListener".equals(invocation.getMethodName()))
             return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
-        String target = Access.queue.get();
-        if(target != null) {
-//            System.out.println("choose:" + target);
-            for (int i = 0; i < invokers.size(); i++) {
-                Invoker<T> invoker = invokers.get(i);
-                if (target.equals(invoker.getUrl().getHost().substring(9))) {
-                    return invoker;
-                }
-                //            int activeCount = RpcStatus.getStatus(invoker.getUrl(), invocation.getMethodName()).getActive();
+        String target = queue.acquire();
+        for(Invoker<T> invoker : invokers) {
+            if (target.equals(invoker.getUrl().getHost().substring(9))) {
+                return invoker;
             }
         }
         return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));

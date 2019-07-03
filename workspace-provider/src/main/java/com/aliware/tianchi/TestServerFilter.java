@@ -9,10 +9,11 @@ import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.Result;
 import org.apache.dubbo.rpc.RpcException;
-import org.apache.dubbo.rpc.listener.CallbackListener;
 
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 /**
  * @author daofeng.xjf
@@ -23,12 +24,18 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Activate(group = Constants.PROVIDER)
 public class TestServerFilter implements Filter {
-    private String quota = System.getProperty("quota");
+    private MsgCounter msgCounter = new MsgCounter();
+    private BlockingQueue<Long> queue = new ArrayBlockingQueue<Long>(MsgCounter.BatchSize * 10);
+    private AtomicInteger atomicInteger = new AtomicInteger();
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
+            queue.add(System.currentTimeMillis());
             Result result = invoker.invoke(invocation);
+//            System.out.println(" " +  System.currentTimeMillis());
+//            if(result.getAttachment("time") == null)
+//                result.setAttachment("time", String.valueOf(System.currentTimeMillis()));result
             return result;
         }catch (Exception e){
             throw e;
@@ -38,10 +45,10 @@ public class TestServerFilter implements Filter {
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
-//        long duration = System.currentTimeMillis();
-        if(Access.listener != null)
-            Access.listener.receiveServerMsg(quota);
-//        System.out.println(System.currentTimeMillis() - duration);
+        long duration = System.currentTimeMillis() - queue.poll();
+//        System.out.println(atomicInteger.getAndIncrement() + " " + duration);
+        msgCounter.add(duration);
+//        System.out.println(invocation.getArguments()[0]);
         return result;
     }
 

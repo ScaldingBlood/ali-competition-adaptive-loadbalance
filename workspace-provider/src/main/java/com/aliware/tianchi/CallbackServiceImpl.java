@@ -1,7 +1,6 @@
 package com.aliware.tianchi;
 
 import com.aliware.tianchi.util.Access;
-import com.aliware.tianchi.util.MsgCounter;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 import org.apache.dubbo.rpc.protocol.dubbo.status.ThreadPoolStatusChecker;
 import org.apache.dubbo.rpc.service.CallbackService;
@@ -49,7 +48,7 @@ public class CallbackServiceImpl implements CallbackService {
     @Override
     public void addListener(String key, CallbackListener listener) {
         Access.listener = listener;
-        String msg = checker.check().getMessage();
-        listener.receiveServerMsg(System.getProperty("quota") + " " + msg.substring(msg.indexOf("max:")+4, msg.indexOf(", core")));
+//        String msg = checker.check().getMessage();
+//        listener.receiveServerMsg(System.getProperty("quota") + " " + msg.substring(msg.indexOf("max:")+4, msg.indexOf(", core")));
     }
 }
