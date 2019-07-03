@@ -28,7 +28,7 @@ public class InvokerQueue {
 
     public String acquire() {
         String[] p = providers;
-        for(int i = 0; i < p.length * 2; i++) {
+        for(int i = 0; i < p.length; i++) {
             Status s = statuses.get(i);
             if(s.getCnt() > 0) {
                 s.acquire();
