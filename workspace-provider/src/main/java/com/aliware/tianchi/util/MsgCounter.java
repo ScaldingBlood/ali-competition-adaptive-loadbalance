@@ -13,7 +13,7 @@ public class MsgCounter {
         double res = 0;
         for(double d : duration) res += d;
         String msg = quota + " " + res / BatchSize;
-        System.out.println(msg);
+//        System.out.println(msg);
         Access.listener.receiveServerMsg(msg);
     }
 

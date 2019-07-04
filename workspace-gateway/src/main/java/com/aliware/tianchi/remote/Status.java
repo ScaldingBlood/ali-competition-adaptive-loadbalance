@@ -1,12 +1,15 @@
 package com.aliware.tianchi.remote;
 
 import com.aliware.tianchi.util.ScalableSemaphore;
+import org.apache.dubbo.common.logger.Logger;
+import org.apache.dubbo.common.logger.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Status {
     public static int batchSize = 64;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Status.class);
 
     private int sum;
     private ScalableSemaphore left;
@@ -15,11 +18,13 @@ public class Status {
     private volatile double avgDuration = 0;
 
     private InvokerQueue queue;
+    private String name;
 
     private static ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    public Status(InvokerQueue queue) {
+    public Status(InvokerQueue queue, String name) {
         this.queue = queue;
+        this.name = name;
     }
 
     public void init(int sum) {
@@ -48,15 +53,17 @@ public class Status {
         cnt--;
         if(cnt == sum) {
             avgDuration = duration;
-        } else if(cnt < sum) {
-            avgDuration = avgDuration * 0.7 + duration * 0.3;
-        } else {
-            if(avgDuration * 1.5 <= duration) {
+        } else if(cnt < sum && cnt > 0) {
+            avgDuration = avgDuration * 0.5 + duration * 0.5;
+        } else if(cnt == 0){
+            if(avgDuration * 1.6 <= duration) {
                 decreaseSize();
             } else {
                 increaseSize();
             }
         }
+//        System.out.println("DURATION: " + name + " " + duration + " " + avgDuration + " " + sum);
+        LOGGER.debug("DURATION: " + name + " " + duration + " " + avgDuration + " " + sum);
     }
 
     public void acquire() {
