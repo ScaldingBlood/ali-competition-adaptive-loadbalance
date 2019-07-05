@@ -62,8 +62,8 @@ public class Status {
                 increaseSize();
             }
         }
-//        System.out.println("DURATION: " + name + " " + duration + " " + avgDuration + " " + sum);
-        LOGGER.debug("DURATION: " + name + " " + duration + " " + avgDuration + " " + sum);
+        System.out.println("DURATION: " + name + " " + duration + " " + avgDuration + " " + sum);
+        LOGGER.info("DURATION: " + name + " " + duration + " " + avgDuration + " " + sum);
     }
 
     public void acquire() {
