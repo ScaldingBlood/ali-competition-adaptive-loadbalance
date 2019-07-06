@@ -54,7 +54,7 @@ public class Status {
 
     public synchronized void decreaseCut(double duration) {
         cnt--;
-        if(duration > avgDuration * 1.8 && sum > 1) {
+        if(duration > avgDuration * 1.7 && sum > 1) {
             System.out.println(this.name + " decrease");
             decreaseSize();
             avgDuration = duration;
@@ -62,7 +62,8 @@ public class Status {
             // release
             left.release(batchSize);
 
-            avgDuration = avgDuration * 0.5 + duration * 0.5;
+//            avgDuration = avgDuration * 0.5 + duration * 0.5;
+            avgDuration = duration;
             if(cnt == 0 && sum < maxNum) {
                 System.out.println(this.name + " increase");
                 increaseSize();
