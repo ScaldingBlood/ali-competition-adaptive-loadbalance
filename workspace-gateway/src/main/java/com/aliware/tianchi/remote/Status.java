@@ -8,10 +8,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Status {
-    public static int batchSize = 64;
-    private static final Logger LOGGER = LoggerFactory.getLogger(Status.class);
+    public static int batchSize = 50;
+//    private static final Logger LOGGER = LoggerFactory.getLogger(Status.class);
 
     private int sum;
+    private int maxNum;
     private ScalableSemaphore left;
     private volatile int cnt;
 
@@ -27,8 +28,9 @@ public class Status {
         this.name = name;
     }
 
-    public void init(int sum) {
-        this.sum = sum;
+    public void init() {
+        maxNum = Access.maxAvailableThreads.get(name) / batchSize;
+        this.sum = maxNum / 2 + 1;
         left = new ScalableSemaphore(this.sum * batchSize);
         cnt = this.sum;
     }
@@ -56,12 +58,12 @@ public class Status {
             avgDuration = duration;
         } else {
             avgDuration = avgDuration * 0.5 + duration * 0.5;
-            if(cnt == 0){
+            if(cnt == 0 && sum < maxNum){
                 increaseSize();
             }
         }
-        System.out.println("DURATION: " + name + " this time: " + duration + " avg duration: " + avgDuration + " cnt: " + cnt + " sum: " + sum);
-        LOGGER.info("DURATION: " + name + " this time: " + duration + " avg duration: " + avgDuration + " cnt: " + cnt + " sum: " + sum);
+        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " cnt: " + cnt + " sum: " + sum);
+//        LOGGER.info("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " cnt: " + cnt + " sum: " + sum);
     }
 
     public void acquire() {

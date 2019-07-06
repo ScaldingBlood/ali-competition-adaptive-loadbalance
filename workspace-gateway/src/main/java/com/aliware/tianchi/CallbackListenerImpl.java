@@ -16,9 +16,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CallbackListenerImpl implements CallbackListener {
     @Override
     public void receiveServerMsg(String msg) {
-        if(msg.contains(" ")) {
-            String[] strs = msg.split(" ");
+        String[] strs = msg.split(" ");
+        if(Access.maxAvailableThreads.containsKey(strs[0]))
             Access.providerMap.get(strs[0]).release(Double.valueOf(strs[1]));
-        }
+        else
+            Access.maxAvailableThreads.put(strs[0], Integer.valueOf(strs[1]));
     }
 }

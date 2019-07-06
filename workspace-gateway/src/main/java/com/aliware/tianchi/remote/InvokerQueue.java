@@ -13,7 +13,7 @@ public class InvokerQueue {
         providerMap = new HashMap<>();
         for(int i = 0; i < providers.length; i++) {
             Status tmp = new Status(this, providers[i]);
-            tmp.init(4);
+            tmp.init();
             providerMap.put(providers[i], tmp);
             statuses.add(tmp);
         }

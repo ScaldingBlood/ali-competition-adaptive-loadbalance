@@ -48,7 +48,8 @@ public class CallbackServiceImpl implements CallbackService {
     @Override
     public void addListener(String key, CallbackListener listener) {
         Access.listener = listener;
-//        String msg = checker.check().getMessage();
-//        listener.receiveServerMsg(System.getProperty("quota") + " " + msg.substring(msg.indexOf("max:")+4, msg.indexOf(", core")));
+        String msg = checker.check().getMessage();
+        System.out.println(msg);
+        listener.receiveServerMsg(System.getProperty("quota") + " " + msg.substring(msg.indexOf("max:")+4, msg.indexOf(", core")));
     }
 }
