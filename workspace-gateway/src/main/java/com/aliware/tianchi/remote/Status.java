@@ -44,7 +44,7 @@ public class Status {
 
     public void decreaseSize() {
         sum--;
-        left.reducePermitsInternal(batchSize);
+//        left.reducePermitsInternal(batchSize);
         cnt = sum + sum + 1;
     }
 
@@ -54,11 +54,14 @@ public class Status {
 
     public synchronized void decreaseCut(double duration) {
         cnt--;
-        if(duration > avgDuration * 1.8) {
+        if(duration > avgDuration * 1.8 && sum > 1) {
             System.out.println(this.name + " decrease");
             decreaseSize();
             avgDuration = duration;
         } else {
+            // release
+            left.release(batchSize);
+
             avgDuration = avgDuration * 0.5 + duration * 0.5;
             if(cnt == 0 && sum < maxNum) {
                 System.out.println(this.name + " increase");
@@ -79,7 +82,6 @@ public class Status {
 
     public void release(double duration) {
         threadPool.submit( () -> {
-            left.release(batchSize);
             decreaseCut(duration);
             queue.sort();
         });
