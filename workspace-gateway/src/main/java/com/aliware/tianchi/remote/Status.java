@@ -31,7 +31,7 @@ public class Status {
 
     public void init() {
         maxNum = Access.maxAvailableThreads.get(name) / batchSize;
-        this.sum = maxNum / 2 + 1;
+        this.sum = maxNum / 2;
         left = new ScalableSemaphore(this.sum * batchSize);
         cnt = this.sum;
     }
@@ -55,13 +55,13 @@ public class Status {
     public synchronized void decreaseCut(double duration) {
         cnt--;
         if(duration > avgDuration * 1.8) {
-            System.out.println("decrease");
+            System.out.println(this.name + " decrease");
             decreaseSize();
             avgDuration = duration;
         } else {
             avgDuration = avgDuration * 0.5 + duration * 0.5;
             if(cnt == 0 && sum < maxNum) {
-                System.out.println("increase");
+                System.out.println(this.name + " increase");
                 increaseSize();
             }
         }

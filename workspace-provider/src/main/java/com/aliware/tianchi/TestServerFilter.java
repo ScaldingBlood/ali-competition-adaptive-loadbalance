@@ -26,21 +26,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TestServerFilter implements Filter {
     private MsgCounter msgCounter = new MsgCounter();
     private BlockingQueue<Long> queue = new ArrayBlockingQueue<Long>(MsgCounter.BatchSize * 10);
-    private AtomicInteger atomicInteger = new AtomicInteger();
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
             queue.add(System.currentTimeMillis());
-            Result result = invoker.invoke(invocation);
-//            System.out.println(" " +  System.currentTimeMillis());
-//            if(result.getAttachment("time") == null)
-//                result.setAttachment("time", String.valueOf(System.currentTimeMillis()));result
-            return result;
-        }catch (Exception e){
+            return invoker.invoke(invocation);
+        } catch (Exception e){
+            Access.listener.receiveServerMsg(System.getProperty("quota") + " out");
             throw e;
         }
-
     }
 
     @Override
