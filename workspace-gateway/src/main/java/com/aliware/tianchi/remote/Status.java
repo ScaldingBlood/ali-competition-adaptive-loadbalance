@@ -4,6 +4,7 @@ import com.aliware.tianchi.util.ScalableSemaphore;
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
 
+import java.awt.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -54,11 +55,13 @@ public class Status {
     public synchronized void decreaseCut(double duration) {
         cnt--;
         if(duration > avgDuration * 1.8) {
+            System.out.println("decrease");
             decreaseSize();
             avgDuration = duration;
         } else {
             avgDuration = avgDuration * 0.5 + duration * 0.5;
-            if(cnt == 0 && sum < maxNum){
+            if(cnt == 0 && sum < maxNum) {
+                System.out.println("increase");
                 increaseSize();
             }
         }

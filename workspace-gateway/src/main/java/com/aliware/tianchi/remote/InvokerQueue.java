@@ -22,8 +22,8 @@ public class InvokerQueue {
 
     public void sort() {
         List<Map.Entry<String, Status>> list = new ArrayList<>(providerMap.entrySet());
-        Collections.sort(list, (x, y) -> (int)(x.getValue().getAvgDuration() - y.getValue().getAvgDuration()));
-        providers = list.stream().map(x -> x.getKey()).toArray(String[]::new);
+        list.sort((x, y) -> (int)(x.getValue().getAvgDuration() - y.getValue().getAvgDuration()));
+        providers = list.stream().map(Map.Entry::getKey).toArray(String[]::new);
     }
 
     public String acquire() {

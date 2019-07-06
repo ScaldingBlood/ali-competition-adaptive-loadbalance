@@ -4,7 +4,7 @@ package com.aliware.tianchi.util;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MsgCounter {
-    public static int BatchSize = 64;
+    public static int BatchSize = 50;
     private volatile double[] duration = new double[BatchSize];
     private static AtomicInteger cnt  = new AtomicInteger();
     private String quota = System.getProperty("quota");
@@ -19,9 +19,13 @@ public class MsgCounter {
 
     public void add(double duration) {
         int pos = cnt.getAndIncrement();
-        if(pos == BatchSize) {
-            callback();
-            cnt.set(0);
+        if(pos >= BatchSize) {
+            synchronized (this) {
+                if(cnt.get() > BatchSize) {
+                    callback();
+                    cnt.set(0);
+                }
+            }
         }
         this.duration[pos % BatchSize] = duration;
     }
