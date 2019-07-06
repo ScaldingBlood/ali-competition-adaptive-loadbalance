@@ -51,19 +51,17 @@ public class Status {
 
     public synchronized void decreaseCut(double duration) {
         cnt--;
-        if(cnt == sum) {
+        if(duration > avgDuration * 1.8) {
+            decreaseSize();
             avgDuration = duration;
-        } else if(cnt < sum && cnt > 0) {
+        } else {
             avgDuration = avgDuration * 0.5 + duration * 0.5;
-        } else if(cnt == 0){
-            if(avgDuration * 1.6 <= duration) {
-                decreaseSize();
-            } else {
+            if(cnt == 0){
                 increaseSize();
             }
         }
-        System.out.println("DURATION: " + name + " " + duration + " " + avgDuration + " " + sum);
-        LOGGER.info("DURATION: " + name + " " + duration + " " + avgDuration + " " + sum);
+        System.out.println("DURATION: " + name + " this time: " + duration + " avg duration: " + avgDuration + " cnt: " + cnt + " sum: " + sum);
+        LOGGER.info("DURATION: " + name + " this time: " + duration + " avg duration: " + avgDuration + " cnt: " + cnt + " sum: " + sum);
     }
 
     public void acquire() {
