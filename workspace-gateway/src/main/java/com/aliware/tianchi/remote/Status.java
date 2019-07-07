@@ -7,6 +7,7 @@ import org.apache.dubbo.common.logger.LoggerFactory;
 import java.awt.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Status {
     public static int batchSize = 30;
@@ -24,6 +25,8 @@ public class Status {
 
     private static ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
+    private static AtomicLong debugInfo;
+
     public Status(InvokerQueue queue, String name) {
         this.queue = queue;
         this.name = name;
@@ -33,17 +36,20 @@ public class Status {
         maxNum = (Access.maxAvailableThreads.get(name) - 10) / batchSize;
         this.sum = maxNum / 2;
         left = new ScalableSemaphore(this.sum * batchSize);
+        debugInfo = new AtomicLong(this.sum * batchSize);
         cnt = this.sum;
     }
 
     public void increaseSize() {
         sum++;
+        for(int i = 0; i < batchSize; i++) debugInfo.incrementAndGet();
         left.increasePermits(batchSize);
         cnt = sum + sum - 1;
     }
 
     public void decreaseSize() {
         sum--;
+        for(int i = 0; i < batchSize; i++) debugInfo.decrementAndGet();
 //        left.reducePermitsInternal(batchSize);
         cnt = sum + sum + 1;
     }
@@ -61,6 +67,7 @@ public class Status {
         } else {
             // release
             left.release(batchSize);
+            for(int i = 0; i < batchSize; i++) debugInfo.incrementAndGet();
 
             avgDuration = avgDuration * 0.5 + duration * 0.5;
             if(cnt == 0 && sum < maxNum) {
@@ -68,13 +75,14 @@ public class Status {
                 increaseSize();
             }
         }
-        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " cnt: " + cnt + " sum: " + sum);
+        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " cnt: " + cnt + " sum: " + sum + " debug " + debugInfo.get());
 //        LOGGER.info("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " cnt: " + cnt + " sum: " + sum);
     }
 
     public void acquire() {
         try {
             left.acquire();
+            debugInfo.decrementAndGet();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
