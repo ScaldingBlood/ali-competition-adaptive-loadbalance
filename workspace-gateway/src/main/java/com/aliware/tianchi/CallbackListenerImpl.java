@@ -1,8 +1,11 @@
 package com.aliware.tianchi;
 
 import com.aliware.tianchi.remote.Access;
+import com.aliware.tianchi.remote.InvokerQueue;
+import com.aliware.tianchi.remote.Status;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -14,16 +17,30 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  */
 public class CallbackListenerImpl implements CallbackListener {
+    private AtomicInteger cnt = new AtomicInteger(0);
+    private volatile boolean flag = false;
+
+    static {
+        Access.queue = new InvokerQueue();
+    }
+
     @Override
     public void receiveServerMsg(String msg) {
         String[] strs = msg.split(" ");
-        if(Access.maxAvailableThreads.containsKey(strs[0])) {
-            if("out".equals(strs[1]))
+        if(!flag) {
+            Status status = new Status(Access.queue, strs[0]);
+            status.init(Integer.valueOf(strs[1]));
+            Access.providerMap.put(strs[0], status);
+            if(Access.providerMap.size() == 3) {
+                flag = true;
+                Access.queue.init();
+                Access.isReady = true;
+            }
+        } else{
+            if ("out".equals(strs[1]))
                 Access.providerMap.get(strs[0]).decreaseSize();
             else
                 Access.providerMap.get(strs[0]).release(Double.valueOf(strs[1]));
         }
-        else
-            Access.maxAvailableThreads.put(strs[0], Integer.valueOf(strs[1]));
     }
 }

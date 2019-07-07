@@ -1,8 +1,10 @@
 package com.aliware.tianchi.remote;
 
+import com.aliware.tianchi.CallbackListenerImpl;
 import com.aliware.tianchi.util.ScalableSemaphore;
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
+import org.apache.dubbo.rpc.listener.CallbackListener;
 
 import java.awt.*;
 import java.util.concurrent.ExecutorService;
@@ -25,19 +27,20 @@ public class Status {
 
     private static ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    private static AtomicLong debugInfo;
+    private AtomicLong debugInfo;
 
     public Status(InvokerQueue queue, String name) {
         this.queue = queue;
         this.name = name;
     }
 
-    public void init() {
-        maxNum = (Access.maxAvailableThreads.get(name) - 10) / batchSize;
+    public void init(int maxAvailableThreads) {
+        maxNum = (maxAvailableThreads - 2) / batchSize;
         this.sum = maxNum / 2;
         left = new ScalableSemaphore(this.sum * batchSize);
         debugInfo = new AtomicLong(this.sum * batchSize);
         cnt = this.sum;
+        System.out.println(debugInfo.get() + " available:" + left.availablePermits());
     }
 
     public void increaseSize() {
@@ -49,7 +52,6 @@ public class Status {
 
     public void decreaseSize() {
         sum--;
-        for(int i = 0; i < batchSize; i++) debugInfo.decrementAndGet();
 //        left.reducePermitsInternal(batchSize);
         cnt = sum + sum + 1;
     }
@@ -68,6 +70,7 @@ public class Status {
             // release
             left.release(batchSize);
             for(int i = 0; i < batchSize; i++) debugInfo.incrementAndGet();
+            System.out.println("release " + debugInfo.get());
 
             avgDuration = avgDuration * 0.5 + duration * 0.5;
             if(cnt == 0 && sum < maxNum) {
@@ -82,7 +85,7 @@ public class Status {
     public void acquire() {
         try {
             left.acquire();
-            debugInfo.decrementAndGet();
+            System.out.println(debugInfo.decrementAndGet() + " available:" + left.availablePermits());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
