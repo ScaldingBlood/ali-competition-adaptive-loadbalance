@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Activate(group = Constants.PROVIDER)
 public class TestServerFilter implements Filter {
     private MsgCounter msgCounter = new MsgCounter();
-    private BlockingQueue<Long> queue = new ArrayBlockingQueue<Long>(MsgCounter.BatchSize * 10);
+    private BlockingQueue<Long> queue = new ArrayBlockingQueue<>(1000);
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
@@ -33,7 +33,8 @@ public class TestServerFilter implements Filter {
             queue.add(System.currentTimeMillis());
             return invoker.invoke(invocation);
         } catch (Exception e){
-            Access.listener.receiveServerMsg(System.getProperty("quota") + " out");
+            System.out.println("out");
+            Access.listener.receiveServerMsg(System.getProperty("quota") + "out");
             throw e;
         }
     }
@@ -41,6 +42,7 @@ public class TestServerFilter implements Filter {
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         long duration = System.currentTimeMillis() - queue.poll();
+        System.out.println(queue.size());
 //        System.out.println(atomicInteger.getAndIncrement() + " " + duration);
         msgCounter.add(duration);
 //        System.out.println(invocation.getArguments()[0]);
