@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Status {
-    public static int batchSize = 50;
+    public static int batchSize = 30;
 //    private static final Logger LOGGER = LoggerFactory.getLogger(Status.class);
 
     private int sum;
@@ -30,7 +30,7 @@ public class Status {
     }
 
     public void init() {
-        maxNum = Access.maxAvailableThreads.get(name) / batchSize;
+        maxNum = (Access.maxAvailableThreads.get(name) - 10) / batchSize;
         this.sum = maxNum / 2;
         left = new ScalableSemaphore(this.sum * batchSize);
         cnt = this.sum;
@@ -54,7 +54,7 @@ public class Status {
 
     public synchronized void decreaseCut(double duration) {
         cnt--;
-        if(duration > avgDuration * 1.7 && sum > 1) {
+        if(duration > avgDuration * 1.8 && sum > 1) {
             System.out.println(this.name + " decrease");
             decreaseSize();
             avgDuration = duration;
@@ -62,8 +62,7 @@ public class Status {
             // release
             left.release(batchSize);
 
-//            avgDuration = avgDuration * 0.5 + duration * 0.5;
-            avgDuration = duration;
+            avgDuration = avgDuration * 0.5 + duration * 0.5;
             if(cnt == 0 && sum < maxNum) {
                 System.out.println(this.name + " increase");
                 increaseSize();
