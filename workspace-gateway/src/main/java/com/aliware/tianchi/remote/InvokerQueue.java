@@ -6,12 +6,18 @@ import java.util.concurrent.ThreadLocalRandom;
 public class InvokerQueue {
     private String[] providers = new String[] {"medium", "large", "small"};
 
-    private Map<String, Status> providerMap;
-    private List<Status> statuses;
+    private Map<String, Status> providerMap = new HashMap<>();
+    private List<Status> statuses = new ArrayList<>();
 
-    public void init() {
-        providerMap = Access.providerMap;
-        statuses = new ArrayList<>(providerMap.values());
+    public InvokerQueue() {
+        providerMap = new HashMap<>();
+        for(int i = 0; i < providers.length; i++) {
+            Status tmp = new Status(this, providers[i]);
+            tmp.init();
+            providerMap.put(providers[i], tmp);
+            statuses.add(tmp);
+        }
+        Access.providerMap = providerMap;
     }
 
     public void sort() {

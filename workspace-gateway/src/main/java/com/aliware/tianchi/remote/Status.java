@@ -34,13 +34,13 @@ public class Status {
         this.name = name;
     }
 
-    public void init(int maxAvailableThreads) {
-        maxNum = (maxAvailableThreads - 2) / batchSize;
+    public void init() {
+        maxNum = (Access.maxAvailableThreads.get(name) - 10) / batchSize;
         this.sum = maxNum / 2;
         left = new ScalableSemaphore(this.sum * batchSize);
         debugInfo = new AtomicLong(this.sum * batchSize);
         cnt = this.sum;
-        if(System.getProperty("quota").equals("small"))
+        if(name.equals("small"))
             System.out.println(debugInfo.get() + " available:" + left.availablePermits());
     }
 
@@ -64,7 +64,7 @@ public class Status {
     public synchronized void decreaseCut(double duration) {
         cnt--;
         if(duration > avgDuration * 1.8 && sum > 1) {
-            if(System.getProperty("quota").equals("small"))
+            if(name.equals("small"))
                 System.out.println(this.name + " decrease");
             decreaseSize();
             avgDuration = duration;
@@ -72,17 +72,17 @@ public class Status {
             // release
             left.release(batchSize);
             for(int i = 0; i < batchSize; i++) debugInfo.incrementAndGet();
-            if(System.getProperty("quota").equals("small"))
+            if(name.equals("small"))
                 System.out.println("release " + debugInfo.get());
 
             avgDuration = avgDuration * 0.5 + duration * 0.5;
             if(cnt == 0 && sum < maxNum) {
-                if(System.getProperty("quota").equals("small"))
+                if(name.equals("small"))
                     System.out.println(this.name + " increase");
                 increaseSize();
             }
         }
-        if(System.getProperty("quota").equals("small"))
+        if(name.equals("small"))
             System.out.println("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " cnt: " + cnt + " sum: " + sum + " debug " + debugInfo.get());
 //        LOGGER.info("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " cnt: " + cnt + " sum: " + sum);
     }
@@ -90,7 +90,7 @@ public class Status {
     public void acquire() {
         try {
             left.acquire();
-            if(System.getProperty("quota").equals("small"))
+            if(name.equals("small"))
                 System.out.println(debugInfo.decrementAndGet() + " available:" + left.availablePermits());
         } catch (InterruptedException e) {
             e.printStackTrace();

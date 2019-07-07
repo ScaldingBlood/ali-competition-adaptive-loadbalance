@@ -4,8 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Access {
-    public static InvokerQueue queue;
-    public static Map<String, Status> providerMap = new ConcurrentHashMap<>();
+    public static Map<String, Status> providerMap;
 
-    public static volatile boolean isReady = false;
+    public static Map<String, Integer> maxAvailableThreads = new ConcurrentHashMap<>();
 }
