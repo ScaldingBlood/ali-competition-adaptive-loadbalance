@@ -35,7 +35,7 @@ public class Status {
     }
 
     public void init() {
-        maxNum = (Access.maxAvailableThreads.get(name) - 10) / batchSize;
+        maxNum = (Access.maxAvailableThreads.get(name)) / batchSize;
         this.sum = maxNum / 2;
         left = new ScalableSemaphore(this.sum * batchSize);
         debugInfo = new AtomicLong(this.sum * batchSize);
@@ -76,7 +76,7 @@ public class Status {
                 System.out.println("release " + debugInfo.get());
 
             avgDuration = avgDuration * 0.5 + duration * 0.5;
-            if(cnt == 0 && sum < maxNum) {
+            if(cnt == 0 && sum < maxNum-1) {
                 if(name.equals("small"))
                     System.out.println(this.name + " increase");
                 increaseSize();
