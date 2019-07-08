@@ -76,7 +76,7 @@ public class Status {
                 System.out.println("release " + debugInfo.get());
 
             avgDuration = avgDuration * 0.5 + duration * 0.5;
-            if(cnt == 0 && sum < maxNum-1) {
+            if(cnt == 0 && sum < maxNum) {
                 if(name.equals("small"))
                     System.out.println(this.name + " increase");
                 increaseSize();

@@ -36,7 +36,7 @@ public class InvokerQueue {
             }
         }
         int index = ThreadLocalRandom.current().nextInt(p.length);
-        statuses.get(index).getCnt();
+        statuses.get(index).acquire();
         return providers[index];
     }
 }
