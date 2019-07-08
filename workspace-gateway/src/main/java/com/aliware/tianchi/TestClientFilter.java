@@ -1,5 +1,7 @@
 package com.aliware.tianchi;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.Filter;
@@ -17,10 +19,13 @@ import org.apache.dubbo.rpc.RpcException;
  */
 @Activate(group = Constants.CONSUMER)
 public class TestClientFilter implements Filter {
+    private AtomicLong atomicLong = new AtomicLong();
+
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
             Result result = invoker.invoke(invocation);
+            atomicLong.getAndIncrement();
             return result;
         }catch (Exception e){
             throw e;
@@ -35,6 +40,7 @@ public class TestClientFilter implements Filter {
             System.out.println("Exception! " + e.getMessage());
             e.printStackTrace();
         }
+        System.out.println("connections: " + atomicLong.decrementAndGet());
         return result;
     }
 }

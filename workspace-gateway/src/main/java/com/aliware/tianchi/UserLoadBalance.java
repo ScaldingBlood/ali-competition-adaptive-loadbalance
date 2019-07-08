@@ -9,7 +9,6 @@ import org.apache.dubbo.rpc.RpcException;
 import org.apache.dubbo.rpc.RpcStatus;
 import org.apache.dubbo.rpc.cluster.LoadBalance;
 
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**

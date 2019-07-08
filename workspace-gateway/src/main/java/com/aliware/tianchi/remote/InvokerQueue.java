@@ -28,18 +28,15 @@ public class InvokerQueue {
 
     public String acquire() {
         String[] p = providers;
-        while(true) {
-            for (int i = 0; i < p.length; i++) {
-                Status s = statuses.get(i);
-                if (s.getCnt() > 0) {
-                    s.acquire();
-                    return p[i];
-                }
+        for(int i = 0; i < p.length; i++) {
+            Status s = providerMap.get(p[i]);
+            if(s.getCnt() > 0) {
+                s.acquire();
+                return p[i];
             }
         }
-//        String target = p[ThreadLocalRandom.current().nextInt(p.length)];
-//        System.out.println(target);
-//        providerMap.get(target).acquire();
-//        return target;
+        String target = p[ThreadLocalRandom.current().nextInt(p.length)];
+        providerMap.get(target).acquire();
+        return target;
     }
 }
