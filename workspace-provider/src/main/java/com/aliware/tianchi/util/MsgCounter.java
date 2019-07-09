@@ -1,28 +1,43 @@
 package com.aliware.tianchi.util;
 
-
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class MsgCounter {
     public static int BatchSize = 30;
-    private volatile double[] duration = new double[BatchSize];
-    private static AtomicInteger cnt  = new AtomicInteger();
     private String quota = System.getProperty("quota");
+    private BlockingQueue<Double> durations;
 
-    public void callback() {
-        double res = 0;
-        for(double d : duration) res += d;
-        String msg = quota + " " + res / BatchSize;
-//        System.out.println(msg);
-        Access.listener.receiveServerMsg(msg);
+    public MsgCounter() {
+        durations = new ArrayBlockingQueue<>(1000);
+        Thread callbackThread = new Thread(() -> {
+            int cnt = 0;
+            double res = 0;
+            while(true) {
+                try {
+                    res += durations.take();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                cnt++;
+               if(cnt == BatchSize) {
+                   String msg = quota + " " + res / BatchSize;
+//                   System.out.println(msg);
+                   Access.listener.receiveServerMsg(msg);
+                   res = 0;
+                   cnt = 0;
+               }
+            }
+        });
+        callbackThread.start();
     }
 
+
     public void add(double duration) {
-        int pos = cnt.getAndIncrement();
-        if(pos == BatchSize) {
-            callback();
-            cnt.set(0);
+        try {
+            durations.put(duration);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        this.duration[pos % BatchSize] = duration;
     }
 }

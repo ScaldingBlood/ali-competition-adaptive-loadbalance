@@ -42,7 +42,6 @@ public class TestServerFilter implements Filter {
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         long duration = System.currentTimeMillis() - queue.poll();
-        System.out.println(queue.size());
 //        System.out.println(atomicInteger.getAndIncrement() + " " + duration);
         msgCounter.add(duration);
 //        System.out.println(invocation.getArguments()[0]);
