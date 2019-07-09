@@ -20,7 +20,7 @@ public class MsgCounter {
                     e.printStackTrace();
                 }
                 if(cnt == BATCH_SIZE) {
-                    double median = findK(arr, 0, BATCH_SIZE, BATCH_SIZE/2 + 1);
+                    double median = findK(arr, 0, BATCH_SIZE-1, BATCH_SIZE/2 + 1);
                     String msg = quota + " " + median;
                     //                   System.out.println(msg);
                     Access.listener.receiveServerMsg(msg);
