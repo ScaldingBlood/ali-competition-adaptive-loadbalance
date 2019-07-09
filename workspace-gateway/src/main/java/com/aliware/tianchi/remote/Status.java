@@ -49,6 +49,7 @@ public class Status {
     public void decreaseSize() {
         sum--;
 //        left.reducePermitsInternal(BATCH_SIZE);
+        cnt = sum;
     }
 
     public int getCnt() {
@@ -58,7 +59,7 @@ public class Status {
     public synchronized void decreaseCut(double duration) {
         cnt--;
         curDuration = duration;
-        if(duration > avgDuration * 2 && sum > 1) {
+        if(duration > avgDuration * 1.85 && sum > 1) {
             decreaseSize();
             lastDuration = duration;
             avgDuration = duration;
@@ -67,7 +68,7 @@ public class Status {
             left.release(BATCH_SIZE);
             avgDuration = lastDuration;
             lastDuration = duration;
-            if(cnt == 0 && sum < maxNum) {
+            if((avgDuration > duration * 1.85 || cnt == 0) && sum < maxNum) {
                 increaseSize();
             }
         }
