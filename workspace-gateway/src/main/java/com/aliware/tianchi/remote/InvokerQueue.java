@@ -6,8 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class InvokerQueue {
     private String[] providers = new String[] {"medium", "large", "small"};
 
-    private Map<String, Status> providerMap = new HashMap<>();
-    private List<Status> statuses = new ArrayList<>();
+    private Map<String, Status> providerMap;
 
     public InvokerQueue() {
         providerMap = new HashMap<>();
@@ -15,7 +14,6 @@ public class InvokerQueue {
             Status tmp = new Status(this, providers[i]);
             tmp.init();
             providerMap.put(providers[i], tmp);
-            statuses.add(tmp);
         }
         Access.providerMap = providerMap;
     }
@@ -24,7 +22,6 @@ public class InvokerQueue {
         List<Map.Entry<String, Status>> list = new ArrayList<>(providerMap.entrySet());
         list.sort((x, y) -> (int)(x.getValue().getCurDuration() - y.getValue().getCurDuration()));
         providers = list.stream().map(Map.Entry::getKey).toArray(String[]::new);
-        System.out.println(Arrays.asList(providers));
     }
 
     public String acquire() {

@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Status {
-    public static int BATCH_SIZE = 25;
+    public static int BATCH_SIZE = 40;
 //    private static final Logger LOGGER = LoggerFactory.getLogger(Status.class);
 
     private int sum;
