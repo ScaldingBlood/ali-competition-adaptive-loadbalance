@@ -6,13 +6,12 @@ import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 
-import java.awt.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Status {
-    public static int batchSize = 30;
+    public static int BATCH_SIZE = 25;
 //    private static final Logger LOGGER = LoggerFactory.getLogger(Status.class);
 
     private int sum;
@@ -20,14 +19,14 @@ public class Status {
     private ScalableSemaphore left;
     private volatile int cnt;
 
-    private volatile double avgDuration = 0;
+    private double lastDuration = 0;
+    private double avgDuration = 0;
+    private volatile double curDuration  = 0;
 
     private InvokerQueue queue;
     private String name;
 
     private static ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
-    private AtomicLong debugInfo;
 
     public Status(InvokerQueue queue, String name) {
         this.queue = queue;
@@ -35,23 +34,21 @@ public class Status {
     }
 
     public void init() {
-        maxNum = (Access.maxAvailableThreads.get(name)) / batchSize;
+        maxNum = (Access.maxAvailableThreads.get(name)) / BATCH_SIZE;
         this.sum = maxNum / 2;
-        left = new ScalableSemaphore(this.sum * batchSize);
-        debugInfo = new AtomicLong(this.sum * batchSize);
+        left = new ScalableSemaphore(this.sum * BATCH_SIZE);
         cnt = this.sum;
     }
 
     public void increaseSize() {
         sum++;
-        for(int i = 0; i < batchSize; i++) debugInfo.incrementAndGet();
-        left.increasePermits(batchSize);
+        left.increasePermits(BATCH_SIZE);
         cnt = sum + sum - 1;
     }
 
     public void decreaseSize() {
         sum--;
-//        left.reducePermitsInternal(batchSize);
+//        left.reducePermitsInternal(BATCH_SIZE);
         cnt = sum + sum + 1;
     }
 
@@ -61,15 +58,16 @@ public class Status {
 
     public synchronized void decreaseCut(double duration) {
         cnt--;
-        if(duration > avgDuration * 1.8 && sum > 1) {
+        curDuration = duration;
+        if(duration > avgDuration * 1.85 && sum > 1) {
             decreaseSize();
+            lastDuration = duration;
             avgDuration = duration;
         } else {
             // release
-            left.release(batchSize);
-            for(int i = 0; i < batchSize; i++) debugInfo.incrementAndGet();
-
-            avgDuration = avgDuration * 0.5 + duration * 0.5;
+            left.release(BATCH_SIZE);
+            avgDuration = lastDuration;
+            lastDuration = duration;
             if(cnt == 0 && sum < maxNum) {
                 increaseSize();
             }
@@ -92,7 +90,7 @@ public class Status {
         });
     }
 
-    public double getAvgDuration() {
-        return avgDuration;
+    public double getCurDuration() {
+        return curDuration;
     }
 }
