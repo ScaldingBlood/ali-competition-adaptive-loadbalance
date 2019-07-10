@@ -43,7 +43,7 @@ public class InvokerQueue {
 //            pos = queueLen[i] < min ? queueLen[i] : pos;
 //        providerMap.get(p[pos]).acquire();
 //        return p[pos];
-        int pos = ThreadLocalRandom.current().nextInt(p.length);\
+        int pos = ThreadLocalRandom.current().nextInt(p.length);
         providerMap.get(p[pos]).acquire();
         return p[pos];
     }
