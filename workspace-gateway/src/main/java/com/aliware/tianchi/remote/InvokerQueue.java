@@ -26,7 +26,7 @@ public class InvokerQueue {
 
     public String acquire() {
         String[] p = providers;
-        int[] queueLen = new int[p.length];
+//        int[] queueLen = new int[p.length];
         for(int i = 0; i < p.length; i++) {
             Status s = providerMap.get(p[i]);
             int len = s.getQueueLen();
@@ -34,14 +34,15 @@ public class InvokerQueue {
                 s.acquire();
                 return p[i];
             } else {
-                queueLen[i] = len;
+//                queueLen[i] = len;
             }
         }
-        int min = queueLen[0];
-        int pos = 0;
-        for(int i = 1; i < queueLen.length; i++)
-            pos = queueLen[i] < min ? queueLen[i] : pos;
-        providerMap.get(p[pos]).acquire();
-        return p[pos];
+//        int min = queueLen[0];
+//        int pos = 0;
+//        for(int i = 1; i < queueLen.length; i++)
+//            pos = queueLen[i] < min ? queueLen[i] : pos;
+//        providerMap.get(p[pos]).acquire();
+//        return p[pos];
+        return p[ThreadLocalRandom.current().nextInt(p.length)];
     }
 }
