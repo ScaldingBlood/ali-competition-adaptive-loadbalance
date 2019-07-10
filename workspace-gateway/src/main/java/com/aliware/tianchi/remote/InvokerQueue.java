@@ -42,6 +42,6 @@ public class InvokerQueue {
         for(int i = 1; i < queueLen.length; i++)
             pos = queueLen[i] < min ? queueLen[i] : pos;
         providerMap.get(p[pos]).acquire();
-        return p[pos;
+        return p[pos];
     }
 }
