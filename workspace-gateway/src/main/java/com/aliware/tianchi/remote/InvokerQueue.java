@@ -29,8 +29,7 @@ public class InvokerQueue {
 //        int[] queueLen = new int[p.length];
         for(int i = 0; i < p.length; i++) {
             Status s = providerMap.get(p[i]);
-            int len = s.getQueueLen();
-            if(len == 0) {
+            if(s.getCnt() > 0) {
                 s.acquire();
                 return p[i];
             } else {

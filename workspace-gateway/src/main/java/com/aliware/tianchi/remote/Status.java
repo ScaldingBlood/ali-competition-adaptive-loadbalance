@@ -51,8 +51,8 @@ public class Status {
         cnt = sum;
     }
 
-    public int getQueueLen() {
-        return left.getQueueLength();
+    public int getCnt() {
+        return left.availablePermits();
     }
 
     public synchronized void decreaseCut(double duration) {
