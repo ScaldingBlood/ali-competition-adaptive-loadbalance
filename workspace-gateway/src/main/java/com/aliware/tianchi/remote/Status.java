@@ -26,7 +26,7 @@ public class Status {
     private InvokerQueue queue;
     private String name;
 
-    private static ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+//    private static ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
 
     public Status(InvokerQueue queue, String name) {
         this.queue = queue;
@@ -84,10 +84,12 @@ public class Status {
     }
 
     public void release(double duration) {
-        threadPool.submit( () -> {
+//        threadPool.submit( () -> {
+            curDuration = duration;
+
             decreaseCut(duration);
             queue.sort();
-        });
+//        });
     }
 
     public double getCurDuration() {
