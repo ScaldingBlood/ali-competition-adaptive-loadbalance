@@ -39,20 +39,24 @@ public class Status {
         cnt = this.sum;
     }
 
-    public void increaseSize() {
+    public synchronized void increaseSize() {
         sum++;
         left.increasePermits(BATCH_SIZE);
         cnt = sum;
     }
 
-    public void decreaseSize() {
+    public synchronized void decreaseSize() {
         sum--;
-//        left.reducePermitsInternal(BATCH_SIZE);
+        left.reducePermitsInternal(BATCH_SIZE);
         cnt = sum;
     }
 
     public int getCnt() {
         return left.availablePermits();
+    }
+
+    public int getSum() {
+        return sum;
     }
 
     public synchronized void decreaseCut(double duration) {
@@ -63,8 +67,6 @@ public class Status {
             lastDuration = duration;
             avgDuration = duration;
         } else {
-            // release
-            left.release(BATCH_SIZE);
             avgDuration = lastDuration;
             lastDuration = duration;
             if((avgDuration > duration * 1.85 || cnt == 0) && sum < maxNum) {
@@ -83,6 +85,7 @@ public class Status {
     }
 
     public void release(double duration) {
+        left.release(BATCH_SIZE);
         curDuration = duration;
         decreaseCut(duration);
         queue.sort();
