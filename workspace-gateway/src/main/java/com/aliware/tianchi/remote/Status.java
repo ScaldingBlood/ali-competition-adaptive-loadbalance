@@ -91,7 +91,7 @@ public class Status {
     public void release(double duration) {
         left.release(BATCH_SIZE);
         curDuration = duration;
-//        decreaseCut(duration);
+        decreaseCut(duration);
         queue.sort();
     }
 
