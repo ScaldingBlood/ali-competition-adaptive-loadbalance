@@ -27,14 +27,14 @@ public class Balancer {
         if (duration == Collections.min(durations.values()) && size < target + 3) {
             if (cnt.get(p) == 0) {
                 Status tmp = Access.providerMap.get(p);
-                tmp.increaseSize(1);
+                tmp.increaseSize(2);
                 cnt.put(p, tmp.getSum());
             }
         }
         if (duration == Collections.max(durations.values()) && size > target - 3) {
             if (cnt.get(p) == 0) {
                 Status tmp = Access.providerMap.get(p);
-                tmp.decreaseSize(1);
+                tmp.decreaseSize(2);
                 cnt.put(p, tmp.getSum());
             }
         }
