@@ -39,18 +39,18 @@ public class Status {
         cnt = this.sum;
     }
 
-    public synchronized void increaseSize() {
-        if(sum < maxNum) {
-            sum++;
-            left.increasePermits(BATCH_SIZE);
+    public synchronized void increaseSize(int num) {
+        if(sum + num <= maxNum) {
+            sum+=num;
+            left.increasePermits(BATCH_SIZE * num);
             cnt = sum;
         }
     }
 
-    public synchronized void decreaseSize() {
-        if(sum > 1) {
-            sum--;
-            left.reducePermitsInternal(BATCH_SIZE);
+    public synchronized void decreaseSize(int num) {
+        if(sum > num) {
+            sum-=num;
+            left.reducePermitsInternal(BATCH_SIZE * num);
             cnt = sum;
         }
     }
@@ -67,14 +67,14 @@ public class Status {
         cnt--;
         curDuration = duration;
         if(duration > avgDuration * 1.85) {
-            decreaseSize();
+            decreaseSize(1);
             lastDuration = duration;
             avgDuration = duration;
         } else {
             avgDuration = lastDuration;
             lastDuration = duration;
             if(avgDuration > duration * 1.85 || cnt == 0) {
-                increaseSize();
+                increaseSize(1);
             }
         }
 //        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " cnt: " + cnt + " sum: " + sum + " debug " + debugInfo.get());
