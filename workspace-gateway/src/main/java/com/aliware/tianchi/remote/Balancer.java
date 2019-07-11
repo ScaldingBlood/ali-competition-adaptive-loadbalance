@@ -22,7 +22,7 @@ public class Balancer {
         cnt.put(p, cnt.getOrDefault(p, 1) - 1);
         int size = Access.providerMap.values().stream().map(Status::getSum).reduce(0, (x, y) -> x + y);
 
-        if (duration == Collections.min(durations.values()) && size < target * 0.8) {
+        if (duration == Collections.min(durations.values())) {
             if (cnt.get(p) == 0) {
                 Status tmp = Access.providerMap.get(p);
                 tmp.increaseSize();
