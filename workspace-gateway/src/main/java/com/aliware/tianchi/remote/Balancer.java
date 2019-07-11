@@ -22,14 +22,14 @@ public class Balancer {
         cnt.put(p, cnt.getOrDefault(p, 1) - 1);
         int size = Access.providerMap.values().stream().map(Status::getSum).reduce(0, (x, y) -> x + y);
 
-        if (duration == Collections.min(durations.values())) {
+        if (duration == Collections.min(durations.values()) && size <= target) {
             if (cnt.get(p) == 0) {
                 Status tmp = Access.providerMap.get(p);
                 tmp.increaseSize();
                 cnt.put(p, tmp.getSum());
             }
         }
-        if (duration == Collections.max(durations.values()) && size > target * 0.3) {
+        if (duration == Collections.max(durations.values()) && size > target) {
             if (cnt.get(p) == 0) {
                 Status tmp = Access.providerMap.get(p);
                 tmp.decreaseSize();
