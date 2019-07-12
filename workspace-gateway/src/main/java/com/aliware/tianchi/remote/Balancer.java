@@ -15,7 +15,7 @@ import java.util.Map;
  * @version $Id: Balancer.java, v 0.1 2019年07月11日 10:07 yeling.cy Exp $
  */
 public class Balancer {
-    private static final double target = 1025 / BATCH_SIZE;
+    private static final double target = 1024 / BATCH_SIZE + 1;
     private Map<String, Double> durations = new HashMap<>();
     private Map<String, Integer> cnt = new HashMap<>();
 
