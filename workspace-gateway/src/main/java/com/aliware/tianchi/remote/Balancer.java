@@ -15,7 +15,7 @@ import java.util.Map;
  * @version $Id: Balancer.java, v 0.1 2019年07月11日 10:07 yeling.cy Exp $
  */
 public class Balancer {
-    private static final double target = 1024 / BATCH_SIZE;
+    private static final double target = 1025 / BATCH_SIZE;
     private Map<String, Double> durations = new HashMap<>();
     private Map<String, Integer> cnt = new HashMap<>();
 
@@ -33,7 +33,7 @@ public class Balancer {
                     durations.put(p, duration + 50);
             }
         }
-        if (duration == Collections.max(durations.values()) && size > target-2) {
+        if (duration == Collections.max(durations.values()) && size > target) {
             if (cnt.get(p) == 0) {
                 Status tmp = Access.providerMap.get(p);
                 if(tmp.decreaseSize(2))
