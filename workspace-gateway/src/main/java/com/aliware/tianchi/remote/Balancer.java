@@ -27,7 +27,7 @@ public class Balancer {
         if (duration == Collections.min(durations.values()) && size <= target+2) {
             if (cnt.get(p) == 0) {
                 Status tmp = Access.providerMap.get(p);
-                if(tmp.increaseSize(2))
+                if(tmp.increaseSize(1))
                     cnt.put(p, tmp.getSum());
                 else
                     durations.put(p, duration + 50);
@@ -36,7 +36,7 @@ public class Balancer {
         if (duration == Collections.max(durations.values()) && size > target) {
             if (cnt.get(p) == 0) {
                 Status tmp = Access.providerMap.get(p);
-                if(tmp.decreaseSize(2))
+                if(tmp.decreaseSize(1))
                     cnt.put(p, tmp.getSum());
                 else
                     durations.put(p, duration - 50);
