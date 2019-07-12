@@ -1,7 +1,10 @@
 package com.aliware.tianchi.remote;
 
 import java.util.*;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class InvokerQueue {
     private String[] providers = new String[] {"medium", "large", "small"};
@@ -9,6 +12,8 @@ public class InvokerQueue {
     private Map<String, Status> providerMap;
 
     private List<Map.Entry<String, Status>> entryList;
+
+    private Lock lock = new ReentrantLock();
 
     public InvokerQueue() {
         providerMap = new HashMap<>();
@@ -22,8 +27,11 @@ public class InvokerQueue {
     }
 
     public void sort() {
-        entryList.sort((x, y) -> (int)(x.getValue().getCurDuration() - y.getValue().getCurDuration()));
-        providers = entryList.stream().map(Map.Entry::getKey).toArray(String[]::new);
+        if(lock.tryLock()) {
+            entryList.sort((x, y) -> (int) (x.getValue().getCurDuration() - y.getValue().getCurDuration()));
+            providers = entryList.stream().map(Map.Entry::getKey).toArray(String[]::new);
+            lock.unlock();
+        }
     }
 
     public String acquire() {
