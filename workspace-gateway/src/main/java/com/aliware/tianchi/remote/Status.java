@@ -39,20 +39,24 @@ public class Status {
         cnt = this.sum;
     }
 
-    public synchronized void increaseSize(int num) {
+    public synchronized boolean increaseSize(int num) {
         if(sum + num <= maxNum) {
             sum+=num;
             left.increasePermits(BATCH_SIZE * num);
             cnt = sum;
+            return true;
         }
+        return false;
     }
 
-    public synchronized void decreaseSize(int num) {
+    public synchronized boolean decreaseSize(int num) {
         if(sum > num) {
             sum-=num;
             left.reducePermitsInternal(BATCH_SIZE * num);
             cnt = sum;
+            return true;
         }
+        return false;
     }
 
     public int getCnt() {
@@ -66,14 +70,14 @@ public class Status {
     public synchronized void decreaseCut(double duration) {
         cnt--;
         curDuration = duration;
-        if(duration > avgDuration * 1.85) {
+        if(duration > avgDuration * 2) {
             decreaseSize(1);
             lastDuration = duration;
             avgDuration = duration;
         } else {
             avgDuration = lastDuration;
             lastDuration = duration;
-            if(avgDuration > duration * 1.85 || cnt == 0) {
+            if(avgDuration > duration * 1.5 || cnt == 0) {
                 increaseSize(1);
             }
         }
