@@ -27,16 +27,18 @@ public class Balancer {
         if (duration == Collections.min(durations.values()) && size < target) {
             if (cnt.get(p) == 0) {
                 Status tmp = Access.providerMap.get(p);
-                tmp.increaseSize(1);
-//                tmp.increaseSize(1);
+                tmp.increaseSize();
+                tmp.increaseSize();
+                tmp.increaseSize();
                 cnt.put(p, tmp.getSum());
             }
         }
         if (duration == Collections.max(durations.values()) && size > target) {
             if (cnt.get(p) == 0) {
                 Status tmp = Access.providerMap.get(p);
-                tmp.decreaseSize(1);
-//                tmp.decreaseSize(1);
+                tmp.decreaseSize();
+                tmp.decreaseSize();
+                tmp.increaseSize();
                 cnt.put(p, tmp.getSum());
             }
         }
