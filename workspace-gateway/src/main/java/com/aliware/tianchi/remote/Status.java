@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Status {
-    public static int BATCH_SIZE = 25;
+    public static int BATCH_SIZE = 40;
 //    private static final Logger LOGGER = LoggerFactory.getLogger(Status.class);
 
     private int sum;
@@ -39,24 +39,20 @@ public class Status {
         cnt = this.sum;
     }
 
-    public synchronized boolean increaseSize(int num) {
+    public synchronized void increaseSize(int num) {
         if(sum + num <= maxNum) {
             sum+=num;
             left.increasePermits(BATCH_SIZE * num);
             cnt = sum;
-            return true;
         }
-        return false;
     }
 
-    public synchronized boolean decreaseSize(int num) {
+    public synchronized void decreaseSize(int num) {
         if(sum > num) {
             sum-=num;
             left.reducePermitsInternal(BATCH_SIZE * num);
             cnt = sum;
-            return true;
         }
-        return false;
     }
 
     public int getCnt() {
@@ -70,14 +66,14 @@ public class Status {
     public synchronized void decreaseCut(double duration) {
         cnt--;
         curDuration = duration;
-        if(duration > avgDuration * 2) {
+        if(duration > avgDuration * 1.85) {
             decreaseSize(1);
             lastDuration = duration;
             avgDuration = duration;
         } else {
             avgDuration = lastDuration;
             lastDuration = duration;
-            if(avgDuration > duration * 1.5 || cnt == 0) {
+            if(avgDuration > duration * 1.85 || cnt == 0) {
                 increaseSize(1);
             }
         }

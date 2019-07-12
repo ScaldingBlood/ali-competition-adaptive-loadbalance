@@ -40,10 +40,7 @@ public class InvokerQueue {
         int pos = 0;
         for(int i = 1; i < ds.length; i++)
             pos = ds[i] < min ? i : pos;
-        Status tmp = providerMap.get(p[pos]);
-        if(tmp.getCnt() > 0)
-            tmp.increaseSize(1);
-        tmp.acquire();
+        providerMap.get(p[pos]).acquire();
         return p[pos];
 //        int pos = ThreadLocalRandom.current().nextInt(p.length);
 //        providerMap.get(p[pos]).acquire();
