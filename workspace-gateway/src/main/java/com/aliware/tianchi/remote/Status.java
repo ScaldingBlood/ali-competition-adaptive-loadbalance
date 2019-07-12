@@ -6,6 +6,7 @@ import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 
+import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
@@ -72,7 +73,7 @@ public class Status {
         } else {
             avgDuration = lastDuration;
             lastDuration = duration;
-            if(avgDuration > duration * 1.85 || cnt == 0) {
+            if(avgDuration > duration * 1.85 || (cnt == 0 && duration < Collections.max(Access.getDuration()))) {
                 increaseSize();
                 cnt = sum;
             }

@@ -28,8 +28,6 @@ public class Balancer {
             if (cnt.get(p) == 0) {
                 Status tmp = Access.providerMap.get(p);
                 tmp.increaseSize();
-                tmp.increaseSize();
-                tmp.increaseSize();
                 cnt.put(p, tmp.getSum());
             }
         }
@@ -37,8 +35,6 @@ public class Balancer {
             if (cnt.get(p) == 0) {
                 Status tmp = Access.providerMap.get(p);
                 tmp.decreaseSize();
-                tmp.decreaseSize();
-                tmp.increaseSize();
                 cnt.put(p, tmp.getSum());
             }
         }
