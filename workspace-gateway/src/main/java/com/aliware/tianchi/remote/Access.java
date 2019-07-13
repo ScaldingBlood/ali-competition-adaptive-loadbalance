@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 public class Access {
     public static Map<String, Status> providerMap;
 
-    public static Map<String, Integer> maxAvailableThreads = new ConcurrentHashMap<>();
+    public static Map<String, Double> maxAvailableThreads = new ConcurrentHashMap<>();
 
     public static List<Double> getDuration() {
         return providerMap.values().stream().map(Status::getCurDuration).collect(Collectors.toList());

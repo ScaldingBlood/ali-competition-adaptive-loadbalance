@@ -1,26 +1,16 @@
 package com.aliware.tianchi.remote;
 
-import com.aliware.tianchi.CallbackListenerImpl;
 import com.aliware.tianchi.util.ScalableSemaphore;
-import org.apache.dubbo.common.logger.Logger;
-import org.apache.dubbo.common.logger.LoggerFactory;
-import org.apache.dubbo.rpc.listener.CallbackListener;
-
 import java.util.Collections;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class Status {
     public static int BATCH_SIZE = 100;
     public static int DELTA_SIZE = 25;
     private static double DELTA_CNT = DELTA_SIZE / BATCH_SIZE;
-//    private static final Logger LOGGER = LoggerFactory.getLogger(Status.class);
 
     private double sum;
-    private int maxNum;
+    private double maxNum;
     private ScalableSemaphore left;
-//    private volatile double cnt;
 
     private double lastDuration = 0;
     private double avgDuration = 0;
@@ -38,7 +28,7 @@ public class Status {
     public void init() {
         maxNum = (Access.maxAvailableThreads.get(name)) / BATCH_SIZE;
         this.sum = maxNum / 2;
-        left = new ScalableSemaphore((int)this.sum * BATCH_SIZE);
+        left = new ScalableSemaphore((int)(this.sum * BATCH_SIZE));
     }
 
     public synchronized void increaseSize() {
@@ -49,7 +39,7 @@ public class Status {
     }
 
     public synchronized void decreaseSize() {
-        if(sum > 1) {
+        if(sum > DELTA_CNT) {
             sum -= DELTA_CNT;
             left.reducePermitsInternal(DELTA_SIZE);
         }
@@ -57,10 +47,6 @@ public class Status {
 
     public int getCnt() {
         return left.availablePermits();
-    }
-
-    public double getSum() {
-        return sum;
     }
 
     public synchronized void decreaseCut(double duration) {
