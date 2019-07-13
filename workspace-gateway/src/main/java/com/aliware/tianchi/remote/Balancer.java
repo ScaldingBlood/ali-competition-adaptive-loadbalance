@@ -6,37 +6,30 @@ package com.aliware.tianchi.remote;
 
 import static com.aliware.tianchi.remote.Status.BATCH_SIZE;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author yeling.cy
  * @version $Id: Balancer.java, v 0.1 2019年07月11日 10:07 yeling.cy Exp $
  */
 public class Balancer {
-    private static final double target = 1024 / BATCH_SIZE + 1;
+    private static final double target = 1024 / BATCH_SIZE;
     private Map<String, Double> durations = new HashMap<>();
-    private Map<String, Integer> cnt = new HashMap<>();
 
     public void balance(String p, double duration) {
         durations.put(p, duration);
-        cnt.put(p, cnt.getOrDefault(p, 1) - 1);
-        int size = Access.providerMap.values().stream().map(Status::getSum).reduce(0, (x, y) -> x + y);
-
-        if (duration == Collections.min(durations.values()) && size < target) {
-            if (cnt.get(p) == 0) {
-                Status tmp = Access.providerMap.get(p);
-                tmp.increaseSize();
-                cnt.put(p, tmp.getSum());
-            }
+        double maxD = 0, minD = Double.MAX_VALUE, sum = 0;
+        for(double v : durations.values()) {
+            maxD = v > maxD ? v : maxD;
+            minD = v < minD ? v : minD;
+            sum += v;
         }
-        if (duration == Collections.max(durations.values()) && size > target) {
-            if (cnt.get(p) == 0) {
-                Status tmp = Access.providerMap.get(p);
-                tmp.decreaseSize();
-                cnt.put(p, tmp.getSum());
-            }
+
+        if (duration == minD && sum <= target) {
+            Access.providerMap.get(p).increaseSize();
+        }
+        if (duration == maxD && sum > target) {
+            Access.providerMap.get(p).decreaseSize();
         }
     }
 }
