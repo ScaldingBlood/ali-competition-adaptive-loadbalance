@@ -5,7 +5,7 @@ import java.util.Collections;
 
 public class Status {
     public static double BATCH_SIZE = 100;
-    public static double DELTA_SIZE = 25;
+    public static double DELTA_SIZE = 30;
     private static double DELTA_CNT = DELTA_SIZE / BATCH_SIZE;
 
     private double sum;
