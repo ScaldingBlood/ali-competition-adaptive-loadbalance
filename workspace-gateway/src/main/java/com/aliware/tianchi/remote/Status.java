@@ -4,8 +4,8 @@ import com.aliware.tianchi.util.ScalableSemaphore;
 import java.util.Collections;
 
 public class Status {
-    public static int BATCH_SIZE = 100;
-    public static int DELTA_SIZE = 25;
+    public static double BATCH_SIZE = 100;
+    public static double DELTA_SIZE = 25;
     private static double DELTA_CNT = DELTA_SIZE / BATCH_SIZE;
 
     private double sum;
@@ -32,16 +32,16 @@ public class Status {
     }
 
     public synchronized void increaseSize() {
-        if(sum + DELTA_CNT < maxNum) {
+        if(sum + DELTA_CNT <= maxNum) {
             sum += DELTA_CNT;
-            left.increasePermits(DELTA_SIZE);
+            left.increasePermits((int)DELTA_SIZE);
         }
     }
 
     public synchronized void decreaseSize() {
         if(sum - DELTA_CNT >= BATCH_SIZE) {
             sum -= DELTA_CNT;
-            left.reducePermitsInternal(DELTA_SIZE);
+            left.reducePermitsInternal((int)DELTA_SIZE);
         }
     }
 
@@ -62,7 +62,7 @@ public class Status {
                 increaseSize();
             }
         }
-//        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " cnt: " + cnt + " sum: " + sum + " debug " + debugInfo.get());
+        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " sum: " + sum);
     }
 
     public void acquire() {
@@ -74,7 +74,7 @@ public class Status {
     }
 
     public void release(double duration) {
-        left.release(BATCH_SIZE);
+        left.release((int)BATCH_SIZE);
         curDuration = duration;
         decreaseCut(duration);
         queue.sort();
