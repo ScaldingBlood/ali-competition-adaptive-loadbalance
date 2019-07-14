@@ -33,10 +33,10 @@ public class Status {
 
     public synchronized void increaseSize(double num) {
         double rate = num / BATCH_SIZE;
-        rate = sum + rate <= maxNum ? rate : maxNum - rate;
+        rate = sum + rate <= maxNum ? rate : maxNum - sum;
         if(rate > 0) {
             sum += rate;
-            left.increasePermits(num);
+            left.increasePermits(rate * BATCH_SIZE);
         }
     }
 
@@ -45,7 +45,7 @@ public class Status {
         rate = sum - rate >= 1 ? rate : sum - 1;
         if(rate > 0) {
             sum -= rate;
-            left.reducePermitsInternal(num);
+            left.reducePermitsInternal(rate * BATCH_SIZE);
         }
     }
 
