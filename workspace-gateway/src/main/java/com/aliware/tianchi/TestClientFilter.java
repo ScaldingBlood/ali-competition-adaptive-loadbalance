@@ -23,8 +23,7 @@ public class TestClientFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
-            Result result = invoker.invoke(invocation);
-            return result;
+            return invoker.invoke(invocation);
         }catch (Exception e){
             throw e;
         }

@@ -33,8 +33,6 @@ public class TestServerFilter implements Filter {
             queue.add(System.currentTimeMillis());
             return invoker.invoke(invocation);
         } catch (Exception e){
-            System.out.println("out");
-            Access.listener.receiveServerMsg(System.getProperty("quota") + "out");
             throw e;
         }
     }
@@ -44,6 +42,8 @@ public class TestServerFilter implements Filter {
         try {
             msgCounter.add(System.currentTimeMillis() - queue.take());
         } catch (InterruptedException e) {
+            System.out.println("out");
+            Access.listener.receiveServerMsg(System.getProperty("quota") + "out");
             e.printStackTrace();
         }
         return result;

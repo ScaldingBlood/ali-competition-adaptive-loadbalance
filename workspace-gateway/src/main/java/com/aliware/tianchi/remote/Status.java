@@ -39,7 +39,7 @@ public class Status {
     }
 
     public synchronized void decreaseSize() {
-        if(sum > DELTA_CNT) {
+        if(sum - DELTA_CNT >= BATCH_SIZE) {
             sum -= DELTA_CNT;
             left.reducePermitsInternal(DELTA_SIZE);
         }
@@ -51,7 +51,7 @@ public class Status {
 
     public synchronized void decreaseCut(double duration) {
         curDuration = duration;
-        if(duration > avgDuration * 1.2) {
+        if(duration > avgDuration * 1.2 && avgDuration != 0) {
             decreaseSize();
             lastDuration = duration;
             avgDuration = duration;
