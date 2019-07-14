@@ -1,7 +1,5 @@
 package com.aliware.tianchi;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.Filter;

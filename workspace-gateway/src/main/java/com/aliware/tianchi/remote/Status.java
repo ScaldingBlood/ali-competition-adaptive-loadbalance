@@ -32,7 +32,7 @@ public class Status {
     }
 
     public synchronized void increaseSize() {
-        if(sum < maxNum) {
+        if(sum + DELTA_CNT < maxNum) {
             sum += DELTA_CNT;
             left.increasePermits(DELTA_SIZE);
         }
