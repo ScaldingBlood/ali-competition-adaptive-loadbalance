@@ -4,9 +4,9 @@ import com.aliware.tianchi.util.ScalableSemaphore;
 import java.util.Collections;
 
 public class Status {
-    public static double BATCH_SIZE = 100;
-    public static double DELTA_SIZE = 30;
-    private static double DELTA_CNT = DELTA_SIZE / BATCH_SIZE;
+    public static final double BATCH_SIZE = 100;
+    private static final double DELTA_SIZE = 25;
+    private static final double THRESHOLD = (BATCH_SIZE + DELTA_SIZE) / BATCH_SIZE - 0.05;
 
     private double sum;
     private double maxNum;
@@ -31,17 +31,21 @@ public class Status {
         left = new ScalableSemaphore(this.sum * BATCH_SIZE);
     }
 
-    public synchronized void increaseSize() {
-        if(sum + DELTA_CNT <= maxNum) {
-            sum += DELTA_CNT;
-            left.increasePermits(DELTA_SIZE);
+    public synchronized void increaseSize(double num) {
+        double rate = num / BATCH_SIZE;
+        rate = sum + rate <= maxNum ? rate : maxNum - rate;
+        if(rate > 0) {
+            sum += rate;
+            left.increasePermits(num);
         }
     }
 
-    public synchronized void decreaseSize() {
-        if(sum - DELTA_CNT >= BATCH_SIZE) {
-            sum -= DELTA_CNT;
-            left.reducePermitsInternal(DELTA_SIZE);
+    public synchronized void decreaseSize(double num) {
+        double rate = num / BATCH_SIZE;
+        rate = sum - rate >= 1 ? rate : sum - 1;
+        if(rate > 0) {
+            sum -= rate;
+            left.reducePermitsInternal(num);
         }
     }
 
@@ -51,15 +55,15 @@ public class Status {
 
     public synchronized void decreaseCut(double duration) {
         curDuration = duration;
-        if(duration > avgDuration * 1.2 && avgDuration != 0) {
-            decreaseSize();
+        if(duration > avgDuration * THRESHOLD && avgDuration != 0) {
+            decreaseSize(DELTA_SIZE);
             lastDuration = duration;
             avgDuration = duration;
         } else {
             avgDuration = lastDuration;
             lastDuration = duration;
-            if(avgDuration > duration * 1.2 || (duration < Collections.max(Access.getDuration()))) {
-                increaseSize();
+            if(avgDuration > duration * THRESHOLD || (duration < Collections.max(Access.getDuration()))) {
+                increaseSize(DELTA_SIZE);
             }
         }
 //        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " sum: " + sum);

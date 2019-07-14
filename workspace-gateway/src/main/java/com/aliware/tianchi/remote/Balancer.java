@@ -5,7 +5,7 @@
 package com.aliware.tianchi.remote;
 
 import static com.aliware.tianchi.remote.Status.BATCH_SIZE;
-import static com.aliware.tianchi.remote.Status.DELTA_SIZE;
+
 
 import java.util.*;
 
@@ -14,7 +14,8 @@ import java.util.*;
  * @version $Id: Balancer.java, v 0.1 2019年07月11日 10:07 yeling.cy Exp $
  */
 public class Balancer {
-    private static final double target = (1024 +  DELTA_SIZE) / BATCH_SIZE;
+    private static final double DELTA = 10;
+    private static final double target = (1024 + DELTA * 3) / BATCH_SIZE;
     private Map<String, Double> durations = new HashMap<>();
 
     public void balance(String p, double duration) {
@@ -26,11 +27,18 @@ public class Balancer {
             sum += v;
         }
 
-        if (duration == minD && sum <= target) {
-            Access.providerMap.get(p).increaseSize();
+        if (sum <= target) {
+            if(duration == minD)
+                Access.providerMap.get(p).increaseSize(DELTA * 3);
+            else if(duration != maxD)
+                Access.providerMap.get(p).increaseSize(DELTA);
+
         }
-        if (duration == maxD && sum > target) {
-            Access.providerMap.get(p).decreaseSize();
+        else {
+            if(duration == maxD)
+                Access.providerMap.get(p).decreaseSize(DELTA * 3);
+            else if(duration != minD)
+                Access.providerMap.get(p).decreaseCut(DELTA);
         }
     }
 }
