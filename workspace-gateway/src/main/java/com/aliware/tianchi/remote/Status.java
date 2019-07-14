@@ -28,20 +28,20 @@ public class Status {
     public void init() {
         maxNum = (Access.maxAvailableThreads.get(name)) / BATCH_SIZE;
         this.sum = maxNum / 2;
-        left = new ScalableSemaphore((int)(this.sum * BATCH_SIZE));
+        left = new ScalableSemaphore(this.sum * BATCH_SIZE);
     }
 
     public synchronized void increaseSize() {
         if(sum + DELTA_CNT <= maxNum) {
             sum += DELTA_CNT;
-            left.increasePermits((int)DELTA_SIZE);
+            left.increasePermits(DELTA_SIZE);
         }
     }
 
     public synchronized void decreaseSize() {
         if(sum - DELTA_CNT >= BATCH_SIZE) {
             sum -= DELTA_CNT;
-            left.reducePermitsInternal((int)DELTA_SIZE);
+            left.reducePermitsInternal(DELTA_SIZE);
         }
     }
 
@@ -62,7 +62,7 @@ public class Status {
                 increaseSize();
             }
         }
-        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " sum: " + sum);
+//        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " sum: " + sum);
     }
 
     public void acquire() {

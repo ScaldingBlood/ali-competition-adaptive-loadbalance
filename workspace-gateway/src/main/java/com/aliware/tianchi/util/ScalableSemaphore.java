@@ -3,15 +3,15 @@ package com.aliware.tianchi.util;
 import java.util.concurrent.Semaphore;
 
 public class ScalableSemaphore extends Semaphore {
-    public ScalableSemaphore(int permits) {
-        super(permits);
+    public ScalableSemaphore(double permits) {
+        super((int)permits);
     }
 
-    public void reducePermitsInternal(int num) {
-        super.reducePermits(num);
+    public void reducePermitsInternal(double num) {
+        super.reducePermits((int)num);
     }
 
-    public void increasePermits(int num) {
-        release(num);
+    public void increasePermits(double num) {
+        release((int)num);
     }
 }
