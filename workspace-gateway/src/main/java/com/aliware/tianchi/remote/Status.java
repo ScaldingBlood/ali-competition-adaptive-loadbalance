@@ -5,8 +5,8 @@ import java.util.Collections;
 
 public class Status {
     public static final int BATCH_SIZE = 100;
-    public static final int DELTA_SIZE = 30;
-    public static final double THRESHOLD = (BATCH_SIZE + DELTA_SIZE) / BATCH_SIZE - 0.05;
+    public static final int DELTA_SIZE = 25;
+    public static final double THRESHOLD = 1.6;
 
     private int sum;
     private int maxNum;
@@ -39,11 +39,11 @@ public class Status {
     }
 
     public synchronized void decreaseSize() {
-//        int size = sum - DELTA_SIZE >= BATCH_SIZE ? DELTA_SIZE : sum - BATCH_SIZE;
-//        if(size > 0) {
-//            sum -= size;
-//            left.reducePermitsInternal(size);
-//        }
+        int size = sum - DELTA_SIZE >= BATCH_SIZE ? DELTA_SIZE : sum - BATCH_SIZE;
+        if(size > 0) {
+            sum -= size;
+            left.reducePermitsInternal(size);
+        }
     }
 
     public int getCnt() {

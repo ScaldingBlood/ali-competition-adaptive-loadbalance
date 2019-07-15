@@ -13,7 +13,7 @@ import java.util.*;
  * @version $Id: Balancer.java, v 0.1 2019年07月11日 10:07 yeling.cy Exp $
  */
 public class Balancer {
-    private static final int target = 1024 + DELTA_SIZE;
+    private static final int target = 1024 + DELTA_SIZE * 3;
     private Map<String, Double> durations = new HashMap<>();
 
     public void balance(String p, double duration) {
