@@ -49,7 +49,9 @@ public class CallbackServiceImpl implements CallbackService {
     public void addListener(String key, CallbackListener listener) {
         Access.listener = listener;
         String msg = checker.check().getMessage();
+        int batch_size = Integer.valueOf(msg.substring(msg.indexOf("max:")+4, msg.indexOf(", core")));
+        Access.msgCounter.init(batch_size /2);
         System.out.println(msg);
-        listener.receiveServerMsg(System.getProperty("quota") + " " + msg.substring(msg.indexOf("max:")+4, msg.indexOf(", core")));
+        listener.receiveServerMsg(System.getProperty("quota") + " " + batch_size);
     }
 }

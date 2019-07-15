@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Activate(group = Constants.PROVIDER)
 public class TestServerFilter implements Filter {
-    private MsgCounter msgCounter = new MsgCounter();
     private BlockingQueue<Long> queue = new ArrayBlockingQueue<>(1000);
 
     @Override
@@ -40,7 +39,7 @@ public class TestServerFilter implements Filter {
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         try {
-            msgCounter.add(System.currentTimeMillis() - queue.take());
+            Access.msgCounter.add(System.currentTimeMillis() - queue.take());
         } catch (InterruptedException e) {
             System.out.println("out");
             Access.listener.receiveServerMsg(System.getProperty("quota") + "out");
