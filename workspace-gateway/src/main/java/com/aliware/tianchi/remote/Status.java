@@ -4,7 +4,7 @@ import com.aliware.tianchi.util.ScalableSemaphore;
 import java.util.Collections;
 
 public class Status {
-    public static Integer BATCH_SIZE = 100;
+    public static Integer BATCH_SIZE = 50;
     public static final int DELTA_SIZE = 25;
     public static final double THRESHOLD = 1.6;
 

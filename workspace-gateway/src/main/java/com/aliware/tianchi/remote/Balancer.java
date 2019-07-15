@@ -25,7 +25,6 @@ public class Balancer {
         }
         int sum = Access.providerMap.values().stream().map(Status::getSum).reduce(0, (x, y) -> x + y);
 
-
         if (duration == minD && sum <= target + DELTA_SIZE * 2) {
             Access.providerMap.get(p).increaseSize(DELTA_SIZE * 2);
         }
