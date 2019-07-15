@@ -16,7 +16,6 @@ public class MsgCounter {
             while(true) {
                 try {
                     arr[cnt++] = durations.take();
-//                    System.out.println(cnt);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
