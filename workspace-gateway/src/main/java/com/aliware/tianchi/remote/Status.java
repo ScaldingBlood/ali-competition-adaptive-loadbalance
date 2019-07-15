@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Status {
-    public static Map<String, Integer> BATCH_SIZE_MAP;
+    public static Map<String, Integer> BATCH_SIZE_MAP = new HashMap<>();
     public static final int DELTA_SIZE = 25;
     public static final double THRESHOLD = 1.6;
 
@@ -24,7 +24,6 @@ public class Status {
     public Status(InvokerQueue queue, String name) {
         this.queue = queue;
         this.name = name;
-        BATCH_SIZE_MAP = new HashMap<>();
     }
 
     public void init() {
@@ -53,6 +52,10 @@ public class Status {
 
     public int getCnt() {
         return left.availablePermits();
+    }
+
+    public int getSum() {
+        return sum;
     }
 
     public synchronized void decreaseCut(double duration) {

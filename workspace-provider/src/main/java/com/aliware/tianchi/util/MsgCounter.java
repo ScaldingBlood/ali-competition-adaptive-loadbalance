@@ -25,7 +25,7 @@ public class MsgCounter {
                 }
                 if(cnt == BATCH_SIZE) {
                     double median = findK(arr, 0, BATCH_SIZE-1, BATCH_SIZE/2 + 1);
-                    String msg = quota + " " + median;
+                    String msg = quota + " " + (median / Math.log(2));
                     //                   System.out.println(msg);
                     Access.listener.receiveServerMsg(msg);
                     cnt = 0;

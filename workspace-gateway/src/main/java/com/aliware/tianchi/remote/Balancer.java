@@ -18,12 +18,12 @@ public class Balancer {
 
     public void balance(String p, double duration) {
         durations.put(p, duration);
-        double maxD = 0, minD = Double.MAX_VALUE, sum = 0;
+        double maxD = 0, minD = Double.MAX_VALUE;
         for(double v : durations.values()) {
             maxD = v > maxD ? v : maxD;
             minD = v < minD ? v : minD;
-            sum += v;
         }
+        int sum = Access.providerMap.values().stream().map(Status::getSum).reduce(0, (x, y) -> x + y);
 
         if (duration == minD && sum <= target + DELTA_SIZE * 2) {
             Access.providerMap.get(p).increaseSize(DELTA_SIZE * 2);
