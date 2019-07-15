@@ -2,11 +2,9 @@ package com.aliware.tianchi.remote;
 
 import com.aliware.tianchi.util.ScalableSemaphore;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Status {
-    public static Map<String, Integer> BATCH_SIZE_MAP = new HashMap<>();
+    public static Integer BATCH_SIZE = 50;
     public static final int DELTA_SIZE = 25;
     public static final double THRESHOLD = 1.6;
 
@@ -30,24 +28,26 @@ public class Status {
         maxNum = Access.maxAvailableThreads.get(name);
         sum = maxNum / 2;
         left = new ScalableSemaphore(sum);
-        BATCH_SIZE_MAP.put(name, sum);
     }
 
-    public synchronized void increaseSize(int size) {
+    public synchronized boolean increaseSize(int size) {
         size = sum + size <= maxNum ? size : maxNum - sum;
         if(size > 0) {
             sum += size;
             left.increasePermits(size);
+            return true;
         }
+        return false;
     }
 
-    public synchronized void decreaseSize(int size) {
-        int batch_size = BATCH_SIZE_MAP.get(name);
-        size = sum - size >= batch_size ? size : sum - batch_size;
+    public synchronized boolean decreaseSize(int size) {
+        size = sum - size >= BATCH_SIZE ? size : sum - BATCH_SIZE;
         if(size > 0) {
             sum -= size;
             left.reducePermitsInternal(size);
+            return true;
         }
+        return false;
     }
 
     public int getCnt() {
@@ -76,7 +76,7 @@ public class Status {
     }
 
     public void release(double duration) {
-        left.release(BATCH_SIZE_MAP.get(name));
+        left.release(BATCH_SIZE);
         curDuration = duration;
         decreaseCut(duration);
         lastDuration = duration;

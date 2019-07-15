@@ -4,7 +4,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class MsgCounter {
-    public static int BATCH_SIZE;
+    public static int BATCH_SIZE = 50;
     private String quota = System.getProperty("quota");
     private BlockingQueue<Double> durations;
 
@@ -12,8 +12,7 @@ public class MsgCounter {
         durations = new ArrayBlockingQueue<>(1000);
     }
 
-    public void init(int batch_size) {
-        BATCH_SIZE = batch_size;
+    public void init() {
         double[] arr = new double[BATCH_SIZE];
         Thread callbackThread = new Thread(() -> {
             int cnt = 0;
