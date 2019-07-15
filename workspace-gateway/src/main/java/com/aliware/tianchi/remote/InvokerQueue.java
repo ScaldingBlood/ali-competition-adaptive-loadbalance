@@ -20,6 +20,7 @@ public class InvokerQueue {
     private Random random = new Random();
 
     public InvokerQueue() {
+        initWeightMap();
         providerMap = new HashMap<>();
         for (int i = 0; i < providers.length; i++) {
             Status tmp = new Status(this, providers[i]);
@@ -68,8 +69,9 @@ public class InvokerQueue {
                 s.acquire();
                 return p[i];
             } else {
-                curDouble = nextDouble * (1 - weightMap.get(p[i]));
                 weightMap.put(p[i], 0.0);
+                refreshWeightMap();
+                curDouble = nextDouble;
                 i = 0;
             }
         }
@@ -82,5 +84,37 @@ public class InvokerQueue {
         int pos = ThreadLocalRandom.current().nextInt(p.length);
         providerMap.get(p[pos]).acquire();
         return p[pos];
+    }
+
+    private void refreshWeightMap() {
+        Set<Map.Entry<String, Double>> entries = weightMap.entrySet();
+        double sum = 0;
+        for (Map.Entry<String, Double> entry : entries) {
+            sum += entry.getValue();
+        }
+        if (sum == 0) {
+            int index = random.nextInt(3);
+            weightMap.put(providers[index], 1.0);
+            return;
+        }
+        Map<String, Double> tempMap = new HashMap<>();
+        for (Map.Entry<String, Double> entry : entries) {
+            tempMap.put(entry.getKey(), entry.getValue() / sum);
+        }
+        weightMap = tempMap;
+    }
+
+    private void initWeightMap() {
+        double sum = 0;
+        List<Double> list = new ArrayList<>();
+        for (int i = 0; i < providers.length; i++) {
+            double randDouble = random.nextDouble();
+            list.add(randDouble);
+            sum += randDouble;
+        }
+        for (int i = 0; i < providers.length; i++) {
+            double weightedDouble = list.get(i) / sum;
+            weightMap.put(providers[i], weightedDouble);
+        }
     }
 }
