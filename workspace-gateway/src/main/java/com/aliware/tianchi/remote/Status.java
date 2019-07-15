@@ -4,16 +4,15 @@ import com.aliware.tianchi.util.ScalableSemaphore;
 import java.util.Collections;
 
 public class Status {
-    public static final double BATCH_SIZE = 100;
-    private static final double DELTA_SIZE = 25;
+    public static final int BATCH_SIZE = 100;
+    private static final int DELTA_SIZE = 25;
     private static final double THRESHOLD = (BATCH_SIZE + DELTA_SIZE) / BATCH_SIZE - 0.05;
 
-    private double sum;
-    private double maxNum;
+    private int sum;
+    private int maxNum;
     private ScalableSemaphore left;
 
     private double lastDuration = 0;
-    private double avgDuration = 0;
     private volatile double curDuration = 0;
 
     private InvokerQueue queue;
@@ -26,26 +25,24 @@ public class Status {
     }
 
     public void init() {
-        maxNum = (Access.maxAvailableThreads.get(name)) / BATCH_SIZE;
+        maxNum = Access.maxAvailableThreads.get(name);
         this.sum = maxNum / 2;
-        left = new ScalableSemaphore(this.sum * BATCH_SIZE);
+        left = new ScalableSemaphore(this.sum);
     }
 
-    public synchronized void increaseSize(double num) {
-        double rate = num / BATCH_SIZE;
-        rate = sum + rate <= maxNum ? rate : maxNum - sum;
-        if(rate > 0) {
-            sum += rate;
-            left.increasePermits(rate * BATCH_SIZE);
+    public synchronized void increaseSize(int num) {
+        num = sum + num <= maxNum ? num : maxNum - sum;
+        if(num > 0) {
+            sum += num;
+            left.increasePermits(num);
         }
     }
 
-    public synchronized void decreaseSize(double num) {
-        double rate = num / BATCH_SIZE;
-        rate = sum - rate >= 1 ? rate : sum - 1;
-        if(rate > 0) {
-            sum -= rate;
-            left.reducePermitsInternal(rate * BATCH_SIZE);
+    public synchronized void decreaseSize(int num) {
+        num = sum - num >= BATCH_SIZE ? num : sum - BATCH_SIZE;
+        if(num > 0) {
+            sum -= num;
+            left.reducePermitsInternal(num);
         }
     }
 
@@ -54,19 +51,14 @@ public class Status {
     }
 
     public synchronized void decreaseCut(double duration) {
-        curDuration = duration;
-        if(duration > avgDuration * THRESHOLD && avgDuration != 0) {
+        if(duration > lastDuration * THRESHOLD && lastDuration != 0) {
             decreaseSize(DELTA_SIZE);
-            lastDuration = duration;
-            avgDuration = duration;
         } else {
-            avgDuration = lastDuration;
-            lastDuration = duration;
-            if(avgDuration > duration * THRESHOLD || (duration < Collections.max(Access.getDuration()))) {
+            if(lastDuration > duration * THRESHOLD || (duration < Collections.max(Access.getDuration()))) {
                 increaseSize(DELTA_SIZE);
             }
         }
-//        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " sum: " + sum);
+        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + lastDuration + " sum: " + sum);
     }
 
     public void acquire() {
@@ -78,9 +70,10 @@ public class Status {
     }
 
     public void release(double duration) {
-        left.release((int)BATCH_SIZE);
+        left.release(BATCH_SIZE);
         curDuration = duration;
         decreaseCut(duration);
+        lastDuration = duration;
         queue.sort();
     }
 

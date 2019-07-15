@@ -4,9 +4,6 @@
  */
 package com.aliware.tianchi.remote;
 
-import static com.aliware.tianchi.remote.Status.BATCH_SIZE;
-
-
 import java.util.*;
 
 /**
@@ -14,8 +11,8 @@ import java.util.*;
  * @version $Id: Balancer.java, v 0.1 2019年07月11日 10:07 yeling.cy Exp $
  */
 public class Balancer {
-    private static final double DELTA = 10;
-    private static final double target = (1024 + DELTA * 3) / BATCH_SIZE;
+    private static final int DELTA = 10;
+    private static final int target = 1024 + DELTA * 3;
     private Map<String, Double> durations = new HashMap<>();
 
     public void balance(String p, double duration) {

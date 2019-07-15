@@ -40,6 +40,7 @@ public class TestServerFilter implements Filter {
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         try {
+//            System.out.println(queue.size());
             msgCounter.add(System.currentTimeMillis() - queue.take());
         } catch (InterruptedException e) {
             System.out.println("out");
