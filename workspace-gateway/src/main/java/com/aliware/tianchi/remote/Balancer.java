@@ -13,7 +13,7 @@ import java.util.*;
  * @version $Id: Balancer.java, v 0.1 2019年07月11日 10:07 yeling.cy Exp $
  */
 public class Balancer {
-    private static final int target = 1024 + DELTA_SIZE * 3;
+    private static final int target = 1024 + DELTA_SIZE;
     private Map<String, Double> durations = new HashMap<>();
 
     public void balance(String p, double duration) {
@@ -25,10 +25,10 @@ public class Balancer {
             sum += v;
         }
 
-        if (duration == minD && sum <= target) {
+        if (duration == minD && sum <= target + DELTA_SIZE * 2) {
             Access.providerMap.get(p).increaseSize();
         }
-        if (duration == maxD && sum > target) {
+        if (duration == maxD && sum > target - DELTA_SIZE * 2) {
             Access.providerMap.get(p).decreaseSize();
         }
     }
