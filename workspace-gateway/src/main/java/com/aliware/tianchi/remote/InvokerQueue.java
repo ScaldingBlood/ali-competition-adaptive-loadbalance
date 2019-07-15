@@ -59,7 +59,7 @@ public class InvokerQueue {
         double curDouble = nextDouble;
         String[] p = providers;
         for (int i = 0; i < p.length; i++) {
-            if (curDouble < weightMap.get(p[i])) {
+            if (curDouble > weightMap.get(p[i])) {
                 curDouble -= weightMap.get(p[i]);
                 continue;
             }
@@ -68,7 +68,8 @@ public class InvokerQueue {
                 s.acquire();
                 return p[i];
             } else {
-                curDouble = (nextDouble / 100) * (1 - weightMap.get(p[i]));
+                curDouble = nextDouble * (1 - weightMap.get(p[i]));
+                weightMap.put(p[i], 0.0);
                 i = 0;
             }
         }
