@@ -56,7 +56,7 @@ public class Status {
         } else if(lastDuration > duration * THRESHOLD || (duration < Collections.max(Access.getDuration()))) {
             increaseSize();
         }
-//        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + avgDuration + " sum: " + sum);
+//        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + lastDuration + " sum: " + sum);
     }
 
     public void acquire() {
