@@ -41,8 +41,8 @@ public class Status {
     public synchronized void decreaseSize() {
         int size = sum - DELTA_SIZE >= BATCH_SIZE ? DELTA_SIZE : sum - BATCH_SIZE;
         if(size > 0) {
-            sum -= DELTA_SIZE;
-            left.reducePermitsInternal(DELTA_SIZE);
+            sum -= size;
+            left.reducePermitsInternal(size);
         }
     }
 
