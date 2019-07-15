@@ -26,10 +26,10 @@ public class Balancer {
         }
 
         if (duration == minD && sum <= target + DELTA_SIZE * 2) {
-            Access.providerMap.get(p).increaseSize();
+            Access.providerMap.get(p).increaseSize(DELTA_SIZE * 2);
         }
-        if (duration == maxD && sum > target - DELTA_SIZE * 2) {
-            Access.providerMap.get(p).decreaseSize();
+        if (duration == maxD && sum > target - DELTA_SIZE) {
+            Access.providerMap.get(p).decreaseSize(DELTA_SIZE * 2);
         }
     }
 }

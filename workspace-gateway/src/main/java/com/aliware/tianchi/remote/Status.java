@@ -30,16 +30,16 @@ public class Status {
         left = new ScalableSemaphore(this.sum);
     }
 
-    public synchronized void increaseSize() {
-        int size = sum + DELTA_SIZE <= maxNum ? DELTA_SIZE : maxNum - sum;
+    public synchronized void increaseSize(int size) {
+        size = sum + size <= maxNum ? size : maxNum - sum;
         if(size > 0) {
             sum += size;
             left.increasePermits(size);
         }
     }
 
-    public synchronized void decreaseSize() {
-        int size = sum - DELTA_SIZE >= BATCH_SIZE ? DELTA_SIZE : sum - BATCH_SIZE;
+    public synchronized void decreaseSize(int size) {
+        size = sum - size >= BATCH_SIZE ? size : sum - BATCH_SIZE;
         if(size > 0) {
             sum -= size;
             left.reducePermitsInternal(size);
@@ -52,9 +52,9 @@ public class Status {
 
     public synchronized void decreaseCut(double duration) {
         if(duration > lastDuration * THRESHOLD && lastDuration != 0) {
-            decreaseSize();
+            decreaseSize(DELTA_SIZE);
         } else if(lastDuration > duration * THRESHOLD || (duration < Collections.max(Access.getDuration()))) {
-            increaseSize();
+            increaseSize(DELTA_SIZE);
         }
 //        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + lastDuration + " sum: " + sum);
     }
