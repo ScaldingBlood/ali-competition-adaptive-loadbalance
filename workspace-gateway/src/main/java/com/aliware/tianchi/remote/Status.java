@@ -1,16 +1,16 @@
 package com.aliware.tianchi.remote;
 
 import com.aliware.tianchi.util.ScalableSemaphore;
-import java.util.Collections;
 
 public class Status {
-    public static Integer BATCH_SIZE = 50;
+    public static Integer BATCH_SIZE = 100;
     public static final int DELTA_SIZE = 25;
-    public static final double THRESHOLD = 1.6;
+    public static final double THRESHOLD = 1.3;
 
     private int sum;
     private int maxNum;
     private ScalableSemaphore left;
+    private double countDown;
 
     private double lastDuration = 0;
     private volatile double curDuration = 0;
@@ -28,6 +28,7 @@ public class Status {
         maxNum = Access.maxAvailableThreads.get(name);
         sum = maxNum / 2;
         left = new ScalableSemaphore(sum);
+        countDown = sum / BATCH_SIZE;
     }
 
     public synchronized boolean increaseSize(int size) {
@@ -58,12 +59,15 @@ public class Status {
         return sum;
     }
 
-    public synchronized void decreaseCut(double duration) {
-        if(duration > lastDuration * THRESHOLD && lastDuration != 0) {
-            decreaseSize(DELTA_SIZE);
-        } else if(lastDuration > duration * THRESHOLD || (duration < Collections.max(Access.getDuration()))) {
-            increaseSize(DELTA_SIZE);
+    public synchronized void adjustPermits(double duration) {
+        if(lastDuration != 0) {
+            if (duration > lastDuration * THRESHOLD) {
+                decreaseSize(DELTA_SIZE);
+            } else {
+                increaseSize(DELTA_SIZE);
+            }
         }
+        lastDuration = duration;
 //        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + lastDuration + " sum: " + sum);
     }
 
@@ -78,8 +82,10 @@ public class Status {
     public void release(double duration) {
         left.release(BATCH_SIZE);
         curDuration = duration;
-        decreaseCut(duration);
-        lastDuration = duration;
+        if(countDown <= -1)
+            adjustPermits(duration);
+        else
+            countDown = sum / BATCH_SIZE;
         queue.sort();
     }
 
