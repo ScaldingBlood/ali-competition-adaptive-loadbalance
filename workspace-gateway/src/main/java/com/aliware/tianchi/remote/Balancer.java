@@ -47,7 +47,7 @@ public class Balancer {
         List<Map.Entry<String, Double>> list = new ArrayList<>(durations.entrySet());
         list.sort((x, y) -> (int)(y.getValue() - x.getValue()));
         for(Map.Entry<String, Double> entry : list) {
-            if (Access.providerMap.get(entry.getKey()).increaseSize(DELTA_SIZE)) {
+            if (Access.providerMap.get(entry.getKey()).decreaseSize(DELTA_SIZE)) {
                 interval = 10;
                 return;
             }
