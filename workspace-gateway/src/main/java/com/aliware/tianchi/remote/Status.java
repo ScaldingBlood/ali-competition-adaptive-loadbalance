@@ -3,7 +3,7 @@ package com.aliware.tianchi.remote;
 import com.aliware.tianchi.util.ScalableSemaphore;
 
 public class Status {
-    public static Integer BATCH_SIZE = 50;
+    public static Integer BATCH_SIZE = 100;
     public static final int DELTA_SIZE = 25;
     public static final double THRESHOLD = 1.25;
 
@@ -25,9 +25,9 @@ public class Status {
     }
 
     public void init() {
-        maxNum = Access.maxAvailableThreads.get(name) - BATCH_SIZE;
+        maxNum = Access.maxAvailableThreads.get(name) - BATCH_SIZE /2;
         sum = maxNum / 2;
-        left = new ScalableSemaphore(sum + BATCH_SIZE);
+        left = new ScalableSemaphore(sum + BATCH_SIZE /2);
         countDown = sum / BATCH_SIZE;
     }
 
@@ -42,7 +42,7 @@ public class Status {
     }
 
     public synchronized boolean decreaseSize(int size) {
-        size = sum - size >= BATCH_SIZE ? size : sum - BATCH_SIZE;
+        size = sum - size >= BATCH_SIZE/2 ? size : sum - BATCH_SIZE/2;
         if(size > 0) {
             sum -= size;
             left.reducePermitsInternal(size);

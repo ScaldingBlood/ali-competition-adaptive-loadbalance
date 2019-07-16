@@ -4,7 +4,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class MsgCounter {
-    public static int BATCH_SIZE = 50;
+    public static int BATCH_SIZE = 100;
     private String quota = System.getProperty("quota");
     private BlockingQueue<Double> durations;
 
