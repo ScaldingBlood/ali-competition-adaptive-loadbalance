@@ -25,9 +25,9 @@ public class Status {
     }
 
     public void init() {
-        maxNum = Access.maxAvailableThreads.get(name);
+        maxNum = Access.maxAvailableThreads.get(name) - BATCH_SIZE;
         sum = maxNum / 2;
-        left = new ScalableSemaphore(sum);
+        left = new ScalableSemaphore(sum + BATCH_SIZE);
         countDown = sum / BATCH_SIZE;
     }
 

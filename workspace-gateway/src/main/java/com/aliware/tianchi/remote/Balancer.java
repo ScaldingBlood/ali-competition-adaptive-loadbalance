@@ -13,7 +13,7 @@ import java.util.*;
  * @version $Id: Balancer.java, v 0.1 2019年07月11日 10:07 yeling.cy Exp $
  */
 public class Balancer {
-    private static final int target = 1025 + DELTA_SIZE;
+    private static final int target = 1025;
     private Map<String, Double> durations = new HashMap<>();
     private int interval = 10;
 
@@ -25,9 +25,10 @@ public class Balancer {
         }
 
         int sum = Access.providerMap.values().stream().map(Status::getSum).reduce(0, (x, y) -> x + y);
-        if(sum < target) {
+        if(sum <= target) {
             enlarge();
-        } else {
+        }
+        if(sum > target) {
             restrict();
         }
         for(Map.Entry<String, Status> entry : Access.providerMap.entrySet()) {
@@ -40,7 +41,7 @@ public class Balancer {
         List<Map.Entry<String, Double>> list = new ArrayList<>(durations.entrySet());
         list.sort((x, y) -> (int)(x.getValue() - y.getValue()));
         for(Map.Entry<String, Double> entry : list) {
-            if (Access.providerMap.get(entry.getKey()).increaseSize(DELTA_SIZE * 2)) {
+            if (Access.providerMap.get(entry.getKey()).increaseSize(DELTA_SIZE)) {
                 interval = 10;
                 return;
             }
@@ -51,7 +52,7 @@ public class Balancer {
         List<Map.Entry<String, Double>> list = new ArrayList<>(durations.entrySet());
         list.sort((x, y) -> (int)(y.getValue() - x.getValue()));
         for(Map.Entry<String, Double> entry : list) {
-            if (Access.providerMap.get(entry.getKey()).decreaseSize(DELTA_SIZE * 2)) {
+            if (Access.providerMap.get(entry.getKey()).decreaseSize(DELTA_SIZE)) {
                 interval = 10;
                 return;
             }
