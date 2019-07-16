@@ -4,7 +4,7 @@ import com.aliware.tianchi.util.ScalableSemaphore;
 
 public class Status {
     public static Integer BATCH_SIZE = 100;
-    public static final int DELTA_SIZE = 25;
+    public static final int DELTA_SIZE = 10;
 //    public static final double THRESHOLD = 1.25;
 
     private int sum;
