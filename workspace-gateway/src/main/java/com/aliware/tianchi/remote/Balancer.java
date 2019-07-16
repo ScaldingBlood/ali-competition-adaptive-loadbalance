@@ -23,10 +23,6 @@ public class Balancer {
         if(interval-- > 0) {
             return;
         }
-        for(Map.Entry<String, Status> entry : Access.providerMap.entrySet()) {
-            System.out.print(entry.getKey() + " " + entry.getValue().getSum() + " ");
-        }
-        System.out.println();
 
         int sum = Access.providerMap.values().stream().map(Status::getSum).reduce(0, (x, y) -> x + y);
         if(sum < target) {
@@ -34,6 +30,10 @@ public class Balancer {
         } else {
             restrict();
         }
+        for(Map.Entry<String, Status> entry : Access.providerMap.entrySet()) {
+            System.out.print(entry.getKey() + " " + entry.getValue().getSum() + " ");
+        }
+        System.out.println(sum);
     }
 
     public void enlarge() {
@@ -51,7 +51,7 @@ public class Balancer {
         List<Map.Entry<String, Double>> list = new ArrayList<>(durations.entrySet());
         list.sort((x, y) -> (int)(y.getValue() - x.getValue()));
         for(Map.Entry<String, Double> entry : list) {
-            if (Access.providerMap.get(entry.getKey()).increaseSize(DELTA_SIZE * 2)) {
+            if (Access.providerMap.get(entry.getKey()).decreaseSize(DELTA_SIZE * 2)) {
                 interval = 10;
                 return;
             }
