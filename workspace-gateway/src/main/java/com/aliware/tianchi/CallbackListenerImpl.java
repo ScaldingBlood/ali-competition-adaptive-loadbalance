@@ -24,7 +24,7 @@ public class CallbackListenerImpl implements CallbackListener {
 //            if("out".equals(strs[1]))
 //                Access.providerMap.get(strs[0]).decreaseSize();
 //            else
-            Access.providerMap.get(strs[0]).release(duration);
+            Access.providerMap.get(strs[0]).notify(duration);
             balancer.balance(strs[0], duration);
         }
         else

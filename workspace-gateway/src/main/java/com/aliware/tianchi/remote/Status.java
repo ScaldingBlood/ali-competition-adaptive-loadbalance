@@ -5,14 +5,12 @@ import com.aliware.tianchi.util.ScalableSemaphore;
 public class Status {
     public static Integer BATCH_SIZE = 100;
     public static final int DELTA_SIZE = 25;
-    public static final double THRESHOLD = 1.25;
+//    public static final double THRESHOLD = 1.25;
 
     private int sum;
     private int maxNum;
     private ScalableSemaphore left;
-    private double countDown;
 
-    private double lastDuration = 0;
     private volatile double curDuration = 0;
 
     private InvokerQueue queue;
@@ -25,10 +23,9 @@ public class Status {
     }
 
     public void init() {
-        maxNum = Access.maxAvailableThreads.get(name) - BATCH_SIZE /2;
-        sum = maxNum / 2;
-        left = new ScalableSemaphore(sum + BATCH_SIZE /2);
-        countDown = sum / BATCH_SIZE;
+        maxNum = Access.maxAvailableThreads.get(name);
+        sum = (int)(Math.ceil(maxNum / 1300.0 * 1024));
+        left = new ScalableSemaphore(sum);
     }
 
     public synchronized boolean increaseSize(int size) {
@@ -42,7 +39,7 @@ public class Status {
     }
 
     public synchronized boolean decreaseSize(int size) {
-        size = sum - size >= BATCH_SIZE/2 ? size : sum - BATCH_SIZE/2;
+        size = sum - size >= 0 ? size : sum;
         if(size > 0) {
             sum -= size;
             left.reducePermitsInternal(size);
@@ -59,17 +56,17 @@ public class Status {
         return sum;
     }
 
-    public synchronized void adjustPermits(double duration) {
-        if(lastDuration != 0) {
-            if (duration > lastDuration * THRESHOLD) {
-                decreaseSize(DELTA_SIZE);
-            } else if(lastDuration > duration * THRESHOLD) {
-                increaseSize(DELTA_SIZE);
-            }
-        }
-        lastDuration = duration;
+//    public synchronized void adjustPermits(double duration) {
+//        if(lastDuration != 0) {
+//            if (duration > lastDuration * THRESHOLD) {
+//                decreaseSize(DELTA_SIZE);
+//            } else if(lastDuration > duration * THRESHOLD) {
+//                increaseSize(DELTA_SIZE);
+//            }
+//        }
+//        lastDuration = duration;
 //        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + lastDuration + " sum: " + sum);
-    }
+//    }
 
     public void acquire() {
         try {
@@ -79,13 +76,13 @@ public class Status {
         }
     }
 
-    public void release(double duration) {
-        left.release(BATCH_SIZE);
+    public void release() {
+        left.release();
+    }
+
+    public void notify(double duration) {
+//        left.release(BATCH_SIZE);
         curDuration = duration;
-        if(countDown <= -1)
-            adjustPermits(duration);
-        else
-            countDown = sum / BATCH_SIZE;
         queue.sort();
     }
 
