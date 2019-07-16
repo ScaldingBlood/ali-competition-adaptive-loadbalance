@@ -8,9 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class InvokerQueue {
     private String[] providers = new String[]{"medium", "large", "small"};
 
-    private String best = providers[0];
-
-    private final double EPSILON = 0.0;
+    private final double EPSILON = 0.10;
 
     private Map<String, Status> providerMap;
 
@@ -30,19 +28,9 @@ public class InvokerQueue {
     }
 
     public void sort() {
-//        if (lock.tryLock()) {
-//            entryList.sort((x, y) -> (int) (x.getValue().getCurDuration() - y.getValue().getCurDuration()));
-//            providers = entryList.stream().map(Map.Entry::getKey).toArray(String[]::new);
-//            lock.unlock();
-//        }
         if (lock.tryLock()) {
-            double fastest = providerMap.get(best).getCurDuration();
-            for (String provider : providers) {
-                double curDuration = providerMap.get(provider).getCurDuration();
-                if (curDuration < fastest) {
-                    best = provider;
-                }
-            }
+            entryList.sort((x, y) -> (int) (x.getValue().getCurDuration() - y.getValue().getCurDuration()));
+            providers = entryList.stream().map(Map.Entry::getKey).toArray(String[]::new);
             lock.unlock();
         }
     }
@@ -50,43 +38,21 @@ public class InvokerQueue {
     public String acquire() {
         String[] p = providers;
         Random random = ThreadLocalRandom.current();
-        Status s = providerMap.get(best);
-        if (s.getCnt() > 0) {
-            s.acquire();
-            return best;
-        }
-
-        //get best of remaining with cnt > 0
-        List<String> remainingProviders = Arrays.asList(p);
-        remainingProviders.remove(best);
-
-        double fastestDuration = providerMap.get(remainingProviders.get(0)).getCurDuration();
-        String bestProvider = remainingProviders.get(0);
-
-        for (String str : remainingProviders) {
-            Status status = providerMap.get(str);
-            if (status.getCnt() > 0 && status.getCurDuration() < fastestDuration) {
-                bestProvider = str;
-                fastestDuration = status.getCurDuration();
+        for (int i = 0; i < p.length; i++) {
+            Status s = providerMap.get(p[i]);
+            int count = s.getCnt();
+            if (count > 10) {
+                s.acquire();
+                return p[i];
             }
+            if (count == 0 || random.nextDouble() > EPSILON * count) {
+                continue;
+            }
+            s.acquire();
+            return p[i];
         }
-        best = bestProvider;
-        return bestProvider;
-
-//        String[] p = providers;
-//        Random random = ThreadLocalRandom.current();
-//        for (int i = 0; i < p.length; i++) {
-//            Status s = providerMap.get(p[i]);
-//            if (s.getCnt() > 0) {
-//                if (random.nextDouble() < EPSILON) {
-//                    continue;
-//                }
-//                s.acquire();
-//                return p[i];
-//            }
-//        }
-//        int pos = random.nextInt(p.length);
-//        providerMap.get(p[pos]).acquire();
-//        return p[pos];
+        int pos = random.nextInt(p.length);
+        providerMap.get(p[pos]).acquire();
+        return p[pos];
     }
 }

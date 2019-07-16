@@ -3,7 +3,7 @@ package com.aliware.tianchi.remote;
 import com.aliware.tianchi.util.ScalableSemaphore;
 
 public class Status {
-    public static Integer BATCH_SIZE = 100;
+    public static Integer BATCH_SIZE = 80;
     public static final int DELTA_SIZE = 25;
     public static final double THRESHOLD = 1.3;
 
