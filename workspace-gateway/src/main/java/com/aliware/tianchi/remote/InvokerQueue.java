@@ -18,9 +18,10 @@ public class InvokerQueue {
         providerMap = new HashMap<>();
         for(int i = 0; i < providers.length; i++) {
             Status tmp = new Status(this, providers[i]);
-            tmp.init();
             providerMap.put(providers[i], tmp);
         }
+        for(Status s : providerMap.values())
+            s.init();
         entryList = new ArrayList<>(providerMap.entrySet());
         Access.providerMap = providerMap;
     }

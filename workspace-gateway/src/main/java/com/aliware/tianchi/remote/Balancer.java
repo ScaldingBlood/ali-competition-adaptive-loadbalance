@@ -27,9 +27,9 @@ public class Balancer {
             restrict();
 //        }
         for(Map.Entry<String, Status> entry : Access.providerMap.entrySet()) {
-            System.out.println(entry.getKey() + " " + entry.getValue().getSum());
+            System.out.print(entry.getKey() + " " + entry.getValue().getSum());
         }
-//        System.out.println(sum);
+        System.out.println();
     }
 
     public void enlarge() {
