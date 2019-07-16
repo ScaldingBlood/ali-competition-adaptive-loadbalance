@@ -1,7 +1,6 @@
 package com.aliware.tianchi.remote;
 
 import java.util.*;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -38,7 +37,7 @@ public class InvokerQueue {
         String[] p = providers;
         for(int i = 0; i < p.length; i++) {
             Status s = providerMap.get(p[i]);
-            if(s.getCnt() > 0) {
+            if(s.getAvailableCnt() > 0) {
                 s.acquire();
                 return p[i];
             }

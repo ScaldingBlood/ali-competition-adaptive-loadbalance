@@ -51,7 +51,7 @@ public class Status {
         return false;
     }
 
-    public int getCnt() {
+    public int getAvailableCnt() {
         return left.availablePermits();
     }
 
