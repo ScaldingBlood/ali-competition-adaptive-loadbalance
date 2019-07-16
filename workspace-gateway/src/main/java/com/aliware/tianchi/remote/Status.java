@@ -5,7 +5,7 @@ import com.aliware.tianchi.util.ScalableSemaphore;
 public class Status {
     public static Integer BATCH_SIZE = 100;
     public static final int DELTA_SIZE = 25;
-    public static final double THRESHOLD = 1.3;
+    public static final double THRESHOLD = 1.25;
 
     private int sum;
     private int maxNum;
@@ -63,7 +63,7 @@ public class Status {
         if(lastDuration != 0) {
             if (duration > lastDuration * THRESHOLD) {
                 decreaseSize(DELTA_SIZE);
-            } else {
+            } else if(lastDuration > duration * THRESHOLD) {
                 increaseSize(DELTA_SIZE);
             }
         }
