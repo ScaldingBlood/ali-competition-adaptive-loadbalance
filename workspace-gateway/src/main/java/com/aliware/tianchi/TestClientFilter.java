@@ -1,6 +1,5 @@
 package com.aliware.tianchi;
 
-import com.aliware.tianchi.remote.Access;
 import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.Filter;
@@ -31,9 +30,6 @@ public class TestClientFilter implements Filter {
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
-        if(Access.providerMap != null) {
-            Access.providerMap.get(invoker.getUrl().getHost().substring(9)).release();
-        }
         Throwable e = result.getException();
         if(e != null) {
             System.out.println("Exception! " + e.getMessage());

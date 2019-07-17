@@ -24,25 +24,23 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Activate(group = Constants.PROVIDER)
 public class TestServerFilter implements Filter {
+    private MsgCounter msgCounter = new MsgCounter();
     private BlockingQueue<Long> queue = new ArrayBlockingQueue<>(1000);
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
-            queue.put(System.currentTimeMillis());
+            queue.add(System.currentTimeMillis());
             return invoker.invoke(invocation);
         } catch (Exception e){
-            e.printStackTrace();
+            throw e;
         }
-        return invoker.invoke(invocation);
     }
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         try {
-            long d = System.currentTimeMillis() - queue.take();
-            Access.msgCounter.add(d);
-            System.out.println(d);
+            msgCounter.add(System.currentTimeMillis() - queue.take());
         } catch (InterruptedException e) {
             System.out.println("out");
             Access.listener.receiveServerMsg(System.getProperty("quota") + "out");
