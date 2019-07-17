@@ -25,7 +25,7 @@ public class Status {
     public void init() {
         maxNum = Access.maxAvailableThreads.get(name);
         System.out.println(name + maxNum);
-        sum = (int)(Math.ceil(maxNum / 1300.0 * 1100));
+        sum = (int)(Math.ceil(maxNum / 1300.0 * 1024));
         left = new ScalableSemaphore(sum -1);
     }
 
