@@ -40,7 +40,7 @@ public class Status {
     }
 
     public synchronized boolean decreaseSize(int size) {
-        size = sum - size > 85 ? size : sum - 85;
+        size = sum - size > 75 ? size : sum - 75;
         if(size > 0) {
             sum -= size;
             left.reducePermitsInternal(size);
