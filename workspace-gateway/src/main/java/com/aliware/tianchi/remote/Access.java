@@ -12,6 +12,8 @@ public class Access {
 
     public static Map<String, Integer> maxAvailableThreads = new ConcurrentHashMap<>();
 
+    public static InvokerQueue queue;
+
     public static List<Double> getDuration() {
         return providerMap.values().stream().map(Status::getCurDuration).collect(Collectors.toList());
     }

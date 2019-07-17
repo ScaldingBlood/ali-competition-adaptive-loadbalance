@@ -84,7 +84,7 @@ public class Status {
     public void notify(double duration) {
 //        left.release(BATCH_SIZE);
         curDuration = duration;
-        queue.sort();
+//        queue.sort();
     }
 
     public double getCurDuration() {

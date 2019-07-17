@@ -22,6 +22,9 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class UserLoadBalance implements LoadBalance {
     private InvokerQueue queue = new InvokerQueue();
+    {
+        Access.queue = this.queue;
+    }
 
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
