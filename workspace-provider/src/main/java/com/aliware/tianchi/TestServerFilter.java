@@ -42,7 +42,7 @@ public class TestServerFilter implements Filter {
         try {
             long d = System.currentTimeMillis() - queue.take();
             Access.msgCounter.add(d);
-            System.out.println(d);
+//            System.out.println(d);
         } catch (InterruptedException e) {
             System.out.println("out");
             Access.listener.receiveServerMsg(System.getProperty("quota") + "out");

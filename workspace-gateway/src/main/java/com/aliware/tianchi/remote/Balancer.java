@@ -15,10 +15,13 @@ import java.util.*;
 public class Balancer {
 //    private static final int target = 1024;
     private Map<String, Double> durations = new HashMap<>();
+    private Set<String> set = new HashSet<>();
 
     public void balance(String p, double duration) {
         durations.put(p, duration);
+        set.add(p);
 
+        if(set.size() == 3) {
 //        int sum = Access.providerMap.values().stream().map(Status::getSum).reduce(0, (x, y) -> x + y);
 //        if(sum <= target) {
             enlarge();
@@ -26,6 +29,8 @@ public class Balancer {
 //        if(sum > target) {
             restrict();
 //        }
+            set = new HashSet<>();
+        }
         for(Map.Entry<String, Status> entry : Access.providerMap.entrySet()) {
             System.out.print(entry.getKey() + " " + entry.getValue().getSum());
         }
