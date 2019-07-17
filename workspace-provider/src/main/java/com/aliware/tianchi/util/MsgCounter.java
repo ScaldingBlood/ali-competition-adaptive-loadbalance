@@ -12,21 +12,25 @@ public class MsgCounter {
     }
 
     public void init(int batchSize) {
-        double[] arr = new double[batchSize];
         Thread callbackThread = new Thread(() -> {
             int cnt = 0;
+            double avg = 0;
             while(true) {
                 try {
-                    arr[cnt++] = durations.take();
+//                    arr[cnt++] = durations.take();
+                    avg += durations.take();
+                    cnt++;
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 if(cnt == batchSize) {
-                    double median = findK(arr, 0, batchSize-1, batchSize/2 + 1);
-                    String msg = quota + " " + (median / Math.log(2));
-//                    System.out.println(msg);
+//                    double median = findK(arr, 0, BATCH_SIZE-1, BATCH_SIZE/2 + 1);
+                    avg /= batchSize;
+                    String msg = quota + " " + avg;
+                    //                   System.out.println(msg);
                     Access.listener.receiveServerMsg(msg);
                     cnt = 0;
+                    avg = 0;
                 }
             }
         });
