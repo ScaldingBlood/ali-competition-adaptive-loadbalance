@@ -26,16 +26,9 @@ public class Status {
     }
 
     public void init() {
-<<<<<<< HEAD
         maxNum = (Access.maxAvailableThreads.get(name)) / BATCH_SIZE;
         this.sum = maxNum / 2;
         left = new ScalableSemaphore(this.sum * BATCH_SIZE);
-=======
-        maxNum = Access.maxAvailableThreads.get(name);
-        System.out.println(name + maxNum);
-        sum = (int)(Math.ceil(maxNum / 1300.0 * 1180));
-        left = new ScalableSemaphore(sum -1);
->>>>>>> yeling/master
     }
 
     public synchronized void increaseSize() {
@@ -45,19 +38,10 @@ public class Status {
         }
     }
 
-<<<<<<< HEAD
     public synchronized void decreaseSize() {
         if(sum - DELTA_CNT >= BATCH_SIZE) {
             sum -= DELTA_CNT;
             left.reducePermitsInternal(DELTA_SIZE);
-=======
-    public synchronized boolean decreaseSize(int size) {
-        size = sum - size > 80 ? size : sum - 80;
-        if(size > 0) {
-            sum -= size;
-            left.reducePermitsInternal(size);
-            return true;
->>>>>>> yeling/master
         }
     }
 
