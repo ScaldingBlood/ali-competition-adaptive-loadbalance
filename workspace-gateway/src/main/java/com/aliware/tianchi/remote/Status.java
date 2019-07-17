@@ -25,7 +25,7 @@ public class Status {
     }
 
     public synchronized boolean increaseSize(int size) {
-        if(size + sum > maxNum) {
+        if(size + sum <= maxNum) {
             sum += size;
             left.increasePermits(size);
             return true;
@@ -34,7 +34,7 @@ public class Status {
     }
 
     public synchronized boolean decreaseSize(int size) {
-        if(sum - size > 0) {
+        if(sum - size > 20) {
             sum -= size;
             left.reducePermitsInternal(size);
             return true;
