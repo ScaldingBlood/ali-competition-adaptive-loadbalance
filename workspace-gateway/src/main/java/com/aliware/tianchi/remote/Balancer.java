@@ -4,12 +4,8 @@
  */
 package com.aliware.tianchi.remote;
 
-<<<<<<< HEAD
 import org.apache.dubbo.common.utils.ConcurrentHashSet;
 
-=======
-import static com.aliware.tianchi.remote.Status.BATCH_SIZE;
->>>>>>> yeling/master
 import static com.aliware.tianchi.remote.Status.DELTA_SIZE;
 
 import java.util.*;
@@ -19,13 +15,12 @@ import java.util.*;
  * @version $Id: Balancer.java, v 0.1 2019年07月11日 10:07 yeling.cy Exp $
  */
 public class Balancer {
-    private static final double target = (1024 +  DELTA_SIZE) / BATCH_SIZE;
+//    private static final int target = 1024;
     private Map<String, Double> durations = new HashMap<>();
     private Set<String> set = new ConcurrentHashSet<>();
 
     public void balance(String p, double duration) {
         durations.put(p, duration);
-<<<<<<< HEAD
         set.add(p);
 
         if(set.size() == 3) {
@@ -44,20 +39,24 @@ public class Balancer {
             Access.queue.sort();
         }
     }
-=======
-        double maxD = 0, minD = Double.MAX_VALUE, sum = 0;
-        for(double v : durations.values()) {
-            maxD = v > maxD ? v : maxD;
-            minD = v < minD ? v : minD;
-            sum += v;
-        }
->>>>>>> yeling/master
 
-        if (duration == minD && sum <= target) {
-            Access.providerMap.get(p).increaseSize();
+    public void enlarge() {
+        List<Map.Entry<String, Double>> list = new ArrayList<>(durations.entrySet());
+        list.sort((x, y) -> (int)(x.getValue() - y.getValue()));
+        for(Map.Entry<String, Double> entry : list) {
+            if (Access.providerMap.get(entry.getKey()).increaseSize(DELTA_SIZE)) {
+                return;
+            }
         }
-        if (duration == maxD && sum > target) {
-            Access.providerMap.get(p).decreaseSize();
+    }
+
+    public void restrict() {
+        List<Map.Entry<String, Double>> list = new ArrayList<>(durations.entrySet());
+        list.sort((x, y) -> (int)(y.getValue() - x.getValue()));
+        for(Map.Entry<String, Double> entry : list) {
+            if (Access.providerMap.get(entry.getKey()).decreaseSize(DELTA_SIZE)) {
+                return;
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.aliware.tianchi.remote;
 
 import java.util.*;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -19,9 +18,10 @@ public class InvokerQueue {
         providerMap = new HashMap<>();
         for(int i = 0; i < providers.length; i++) {
             Status tmp = new Status(this, providers[i]);
-            tmp.init();
             providerMap.put(providers[i], tmp);
         }
+        for(Status s : providerMap.values())
+            s.init();
         entryList = new ArrayList<>(providerMap.entrySet());
         Access.providerMap = providerMap;
     }
@@ -29,7 +29,15 @@ public class InvokerQueue {
     public void sort() {
         if(lock.tryLock()) {
             entryList.sort((x, y) -> (int) (x.getValue().getCurDuration() - y.getValue().getCurDuration()));
-            providers = entryList.stream().map(Map.Entry::getKey).toArray(String[]::new);
+            String[] tmp = new String[entryList.size()];
+            int i = 0;
+            for(Map.Entry<String, Status> entry : entryList) {
+                System.out.print(entry.getKey() + " " + entry.getValue().getCurDuration());
+                tmp[i++] = entry.getKey();
+            }
+            System.out.println();
+//            providers = entryList.stream().map(Map.Entry::getKey).toArray(String[]::new);
+            providers = tmp;
             lock.unlock();
         }
     }
@@ -38,7 +46,7 @@ public class InvokerQueue {
         String[] p = providers;
         for(int i = 0; i < p.length; i++) {
             Status s = providerMap.get(p[i]);
-            if(s.getCnt() > 0) {
+            if(s.getAvailableCnt() > 0) {
                 s.acquire();
                 return p[i];
             }

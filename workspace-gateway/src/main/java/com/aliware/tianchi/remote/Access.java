@@ -1,5 +1,7 @@
 package com.aliware.tianchi.remote;
 
+import com.aliware.tianchi.util.ScalableSemaphore;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
