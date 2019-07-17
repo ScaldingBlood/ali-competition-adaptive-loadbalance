@@ -3,9 +3,7 @@ package com.aliware.tianchi.remote;
 import com.aliware.tianchi.util.ScalableSemaphore;
 
 public class Status {
-    public static Integer BATCH_SIZE = 100;
     public static final int DELTA_SIZE = 10;
-//    public static final double THRESHOLD = 1.25;
 
     private int sum;
     private int maxNum;
@@ -13,12 +11,9 @@ public class Status {
 
     private volatile double curDuration = 0;
 
-    private InvokerQueue queue;
     private String name;
 
-
-    public Status(InvokerQueue queue, String name) {
-        this.queue = queue;
+    public Status(String name) {
         this.name = name;
     }
 
@@ -40,7 +35,7 @@ public class Status {
     }
 
     public synchronized boolean decreaseSize(int size) {
-        size = sum - size > 20 ? size : sum - 20;
+        size = sum - size >= 20 ? size : sum - 20;
         if(size > 0) {
             sum -= size;
             left.reducePermitsInternal(size);
@@ -57,18 +52,6 @@ public class Status {
         return sum;
     }
 
-//    public synchronized void adjustPermits(double duration) {
-//        if(lastDuration != 0) {
-//            if (duration > lastDuration * THRESHOLD) {
-//                decreaseSize(DELTA_SIZE);
-//            } else if(lastDuration > duration * THRESHOLD) {
-//                increaseSize(DELTA_SIZE);
-//            }
-//        }
-//        lastDuration = duration;
-//        System.out.println("DURATION: " + name + " this: " + duration + " avg: " + lastDuration + " sum: " + sum);
-//    }
-
     public void acquire() {
         try {
             left.acquire();
@@ -82,9 +65,7 @@ public class Status {
     }
 
     public void notify(double duration) {
-//        left.release(BATCH_SIZE);
         curDuration = duration;
-//        queue.sort();
     }
 
     public double getCurDuration() {

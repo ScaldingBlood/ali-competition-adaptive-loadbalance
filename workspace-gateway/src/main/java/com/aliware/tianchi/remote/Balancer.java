@@ -4,7 +4,6 @@
  */
 package com.aliware.tianchi.remote;
 
-import org.apache.dubbo.common.utils.ConcurrentHashSet;
 
 import static com.aliware.tianchi.remote.Status.DELTA_SIZE;
 
@@ -15,7 +14,6 @@ import java.util.*;
  * @version $Id: Balancer.java, v 0.1 2019年07月11日 10:07 yeling.cy Exp $
  */
 public class Balancer {
-//    private static final int target = 1024;
     private Map<String, Double> durations = new HashMap<>();
     private Set<String> set = new HashSet<>();
 
@@ -25,19 +23,13 @@ public class Balancer {
         System.out.println("balance " + p);
 
         if(set.size() == 3) {
-//        int sum = Access.providerMap.values().stream().map(Status::getSum).reduce(0, (x, y) -> x + y);
-//        if(sum <= target) {
             enlarge();
-//        }
-//        if(sum > target) {
             restrict();
-//        }
             set.clear();
             for(Map.Entry<String, Status> entry : Access.providerMap.entrySet()) {
                 System.out.print(entry.getKey() + " " + entry.getValue().getSum());
             }
             System.out.println();
-//            Access.queue.sort();
         }
     }
 
