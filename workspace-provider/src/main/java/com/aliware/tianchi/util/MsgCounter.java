@@ -4,32 +4,29 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class MsgCounter {
-    public static int BATCH_SIZE = 2000;
     private String quota = System.getProperty("quota");
     private BlockingQueue<Double> durations;
 
     public MsgCounter() {
         durations = new ArrayBlockingQueue<>(1000);
-//        double[] arr = new double[BATCH_SIZE];
+    }
+
+    public void init(int batchSize) {
+        double[] arr = new double[batchSize];
         Thread callbackThread = new Thread(() -> {
             int cnt = 0;
-            double avg = 0;
             while(true) {
                 try {
-//                    arr[cnt++] = durations.take();
-                    avg += durations.take();
-                    cnt++;
+                    arr[cnt++] = durations.take();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if(cnt == BATCH_SIZE) {
-//                    double median = findK(arr, 0, BATCH_SIZE-1, BATCH_SIZE/2 + 1);
-                    avg /= BATCH_SIZE;
-                    String msg = quota + " " + avg;
+                if(cnt == batchSize) {
+                    double median = findK(arr, 0, batchSize-1, batchSize/2 + 1);
+                    String msg = quota + " " + (median / Math.log(2));
                     //                   System.out.println(msg);
                     Access.listener.receiveServerMsg(msg);
                     cnt = 0;
-                    avg = 0;
                 }
             }
         });

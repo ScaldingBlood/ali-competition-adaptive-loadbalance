@@ -29,17 +29,20 @@ public class TestServerFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
-            queue.add(System.currentTimeMillis());
+            queue.put(System.currentTimeMillis());
             return invoker.invoke(invocation);
         } catch (Exception e){
-            throw e;
+            e.printStackTrace();
         }
+        return invoker.invoke(invocation);
     }
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         try {
-            Access.msgCounter.add(System.currentTimeMillis() - queue.take());
+            long d = System.currentTimeMillis() - queue.take();
+            Access.msgCounter.add(d);
+            System.out.println(d);
         } catch (InterruptedException e) {
             System.out.println("out");
             Access.listener.receiveServerMsg(System.getProperty("quota") + "out");
