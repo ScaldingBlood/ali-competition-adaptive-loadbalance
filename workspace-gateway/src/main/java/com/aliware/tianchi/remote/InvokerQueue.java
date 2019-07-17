@@ -10,9 +10,9 @@ public class InvokerQueue {
 
     private Map<String, Status> providerMap;
 
-    private List<Map.Entry<String, Status>> entryList;
+//    private List<Map.Entry<String, Status>> entryList;
 
-    private Lock lock = new ReentrantLock();
+//    private Lock lock = new ReentrantLock();
 
     public InvokerQueue() {
         providerMap = new HashMap<>();
@@ -22,7 +22,7 @@ public class InvokerQueue {
         }
         for(Status s : providerMap.values())
             s.init();
-        entryList = new ArrayList<>(providerMap.entrySet());
+//        entryList = new ArrayList<>(providerMap.entrySet());
         Access.providerMap = providerMap;
     }
 

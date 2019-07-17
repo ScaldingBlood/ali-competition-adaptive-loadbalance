@@ -11,10 +11,11 @@ public class MsgCounter {
         durations = new ArrayBlockingQueue<>(1000);
     }
 
-    public void init(int batchSize) {
+    public void init() {
         Thread callbackThread = new Thread(() -> {
             int cnt = 0;
             double avg = 0;
+            int batchSize = 20;
             while(true) {
                 try {
 //                    arr[cnt++] = durations.take();
@@ -32,6 +33,7 @@ public class MsgCounter {
                     Access.listener.receiveServerMsg(msg);
                     cnt = 0;
                     avg = 0;
+                    batchSize = durations.size() * 2 + 20;
                 }
             }
         });
