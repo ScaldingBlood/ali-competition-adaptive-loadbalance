@@ -29,7 +29,15 @@ public class InvokerQueue {
     public void sort() {
         if(lock.tryLock()) {
             entryList.sort((x, y) -> (int) (x.getValue().getCurDuration() - y.getValue().getCurDuration()));
-            providers = entryList.stream().map(Map.Entry::getKey).toArray(String[]::new);
+            String[] tmp = new String[entryList.size()];
+            int i = 0;
+            for(Map.Entry<String, Status> entry : entryList) {
+                System.out.print(entry.getKey() + " " + entry.getValue().getCurDuration());
+                tmp[i++] = entry.getKey();
+            }
+            System.out.println();
+//            providers = entryList.stream().map(Map.Entry::getKey).toArray(String[]::new);
+            providers = tmp;
             lock.unlock();
         }
     }

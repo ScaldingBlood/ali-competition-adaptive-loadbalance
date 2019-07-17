@@ -26,10 +26,10 @@ public class Balancer {
 //        if(sum > target) {
             restrict();
 //        }
-//        for(Map.Entry<String, Status> entry : Access.providerMap.entrySet()) {
-//            System.out.print(entry.getKey() + " " + entry.getValue().getSum());
-//        }
-//        System.out.println();
+        for(Map.Entry<String, Status> entry : Access.providerMap.entrySet()) {
+            System.out.print(entry.getKey() + " " + entry.getValue().getSum());
+        }
+        System.out.println();
     }
 
     public void enlarge() {
