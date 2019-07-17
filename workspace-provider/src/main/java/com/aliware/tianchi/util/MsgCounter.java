@@ -1,14 +1,14 @@
 package com.aliware.tianchi.util;
 
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class MsgCounter {
     private String quota = System.getProperty("quota");
     private BlockingQueue<Double> durations;
 
     public MsgCounter() {
-        durations = new LinkedBlockingQueue<>();
+        durations = new ArrayBlockingQueue<>(1000);
     }
 
     public void init() {

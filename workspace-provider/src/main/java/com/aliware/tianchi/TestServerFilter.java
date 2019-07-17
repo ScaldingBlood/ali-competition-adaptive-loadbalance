@@ -10,8 +10,8 @@ import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.Result;
 import org.apache.dubbo.rpc.RpcException;
 
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 
 /**
@@ -23,7 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 @Activate(group = Constants.PROVIDER)
 public class TestServerFilter implements Filter {
-    private BlockingQueue<Long> queue = new LinkedBlockingQueue<>();
+    private BlockingQueue<Long> queue = new ArrayBlockingQueue<>(1000);
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
