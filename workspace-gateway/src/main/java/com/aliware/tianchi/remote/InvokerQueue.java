@@ -26,39 +26,44 @@ public class InvokerQueue {
         Access.providerMap = providerMap;
     }
 
-    public void sort() {
-        if(lock.tryLock()) {
-            entryList.sort((x, y) -> (int) (x.getValue().getCurDuration() - y.getValue().getCurDuration()));
-            String[] tmp = new String[entryList.size()];
-            int i = 0;
-            for(Map.Entry<String, Status> entry : entryList) {
-                System.out.print(entry.getKey() + " " + entry.getValue().getCurDuration());
-                tmp[i++] = entry.getKey();
-            }
-            System.out.println();
-//            providers = entryList.stream().map(Map.Entry::getKey).toArray(String[]::new);
-            providers = tmp;
-            lock.unlock();
-        }
-    }
+//    public void sort() {
+//        if(lock.tryLock()) {
+//            entryList.sort((x, y) -> (int) (x.getValue().getCurDuration() - y.getValue().getCurDuration()));
+//            String[] tmp = new String[entryList.size()];
+//            int i = 0;
+//            for(Map.Entry<String, Status> entry : entryList) {
+//                System.out.print(entry.getKey() + " " + entry.getValue().getCurDuration());
+//                tmp[i++] = entry.getKey();
+//            }
+//            System.out.println();
+////            providers = entryList.stream().map(Map.Entry::getKey).toArray(String[]::new);
+//            providers = tmp;
+//            lock.unlock();
+//        }
+//    }
 
     public String acquire() {
         String[] p = providers;
-        for(int i = 0; i < p.length; i++) {
-            Status s = providerMap.get(p[i]);
-            if(s.getAvailableCnt() > 0) {
-                s.acquire();
-                return p[i];
-            }
-        }
+//        for(int i = 0; i < p.length; i++) {
+//            Status s = providerMap.get(p[i]);
+//            if(s.getAvailableCnt() > 0) {
+//                s.acquire();
+//                return p[i];
+//            }
+//        }
 //        double min = ds[0];
 //        int pos = 0;
 //        for(int i = 1; i < ds.length; i++)
 //            pos = ds[i] < min ? i : pos;
 //        providerMap.get(p[pos]).acquire();
 //        return p[pos];
-        int pos = ThreadLocalRandom.current().nextInt(p.length);
-        providerMap.get(p[pos]).acquire();
-        return p[pos];
+        while(true) {
+            int pos = ThreadLocalRandom.current().nextInt(p.length);
+            Status s = providerMap.get(p[pos]);
+            if(s.getAvailableCnt() > 0) {
+                providerMap.get(p[pos]).acquire();
+                return p[pos];
+            }
+        }
     }
 }
