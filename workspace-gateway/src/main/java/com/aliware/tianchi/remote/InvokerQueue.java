@@ -26,10 +26,24 @@ public class InvokerQueue {
         Access.providerMap = providerMap;
     }
 
-    public void sort() {
+    /*public void sort() {
         if(lock.tryLock()) {
             entryList.sort((x, y) -> (int) (x.getValue().getCurDuration() - y.getValue().getCurDuration()));
             providers = entryList.stream().map(Map.Entry::getKey).toArray(String[]::new);
+            lock.unlock();
+        }
+    }*/
+    public void sort() {
+        if (lock.tryLock()) {
+            entryList.sort(new Comparator<Map.Entry<String, Status>>() {
+                @Override
+                public int compare(Map.Entry<String, Status> x, Map.Entry<String, Status> y) {
+                    return (int) (x.getValue().getCurDuration() - y.getValue().getCurDuration());
+                }
+            });
+            for (int i = 0; i < entryList.size(); i++) {
+                providers[i] = entryList.get(i).getKey();
+            }
             lock.unlock();
         }
     }
