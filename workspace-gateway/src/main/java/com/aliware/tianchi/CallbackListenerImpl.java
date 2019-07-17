@@ -28,6 +28,6 @@ public class CallbackListenerImpl implements CallbackListener {
 //            balancer.balance(strs[0], duration);
         }
         else
-            Access.maxAvailableThreads.put(strs[0], Double.valueOf(strs[1]));
+            Access.maxAvailableThreads.put(strs[0], Integer.valueOf(strs[1]));
     }
 }
