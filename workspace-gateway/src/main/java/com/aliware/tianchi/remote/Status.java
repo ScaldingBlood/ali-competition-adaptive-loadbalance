@@ -27,7 +27,7 @@ public class Status {
 
     public void init() {
         maxNum = (Access.maxAvailableThreads.get(name)) / BATCH_SIZE;
-        this.sum = maxNum / 2;
+        this.sum = maxNum;
         left = new ScalableSemaphore(this.sum * BATCH_SIZE);
     }
 
@@ -76,7 +76,7 @@ public class Status {
     public void release(double duration) {
         left.release((int)BATCH_SIZE);
         curDuration = duration;
-        decreaseCut(duration);
+//        decreaseCut(duration);
         queue.sort();
     }
 
