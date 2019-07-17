@@ -25,7 +25,7 @@ public class Status {
     public void init() {
         maxNum = Access.maxAvailableThreads.get(name);
         System.out.println(name + maxNum);
-        sum = (int)(Math.ceil(maxNum / 1300.0 * 1024));
+        sum = (int)(Math.ceil(maxNum / 1300.0 * 1100));
         left = new ScalableSemaphore(sum -1);
     }
 
@@ -40,7 +40,7 @@ public class Status {
     }
 
     public synchronized boolean decreaseSize(int size) {
-        size = sum - size > 50 ? size : sum - 50;
+        size = sum - size > 85 ? size : sum - 85;
         if(size > 0) {
             sum -= size;
             left.reducePermitsInternal(size);
