@@ -30,7 +30,7 @@ public class MsgCounter {
                     Access.listener.receiveServerMsg(msg);
                     cnt = 0;
                     avg = 0;
-                    batchSize = durations.size() * 2 + 10;
+                    batchSize = Access.msgQueue.size() * 2 + 10;
                 }
             }
         }).start();

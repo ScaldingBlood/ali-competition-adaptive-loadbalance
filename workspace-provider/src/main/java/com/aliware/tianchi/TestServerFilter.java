@@ -10,9 +10,6 @@ import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.Result;
 import org.apache.dubbo.rpc.RpcException;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-
 
 /**
  * @author daofeng.xjf
@@ -23,12 +20,11 @@ import java.util.concurrent.BlockingQueue;
  */
 @Activate(group = Constants.PROVIDER)
 public class TestServerFilter implements Filter {
-    private BlockingQueue<Long> queue = new ArrayBlockingQueue<>(1000);
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
-            queue.put(System.currentTimeMillis());
+            Access.msgQueue.put(System.currentTimeMillis());
             return invoker.invoke(invocation);
         } catch (Exception e){
             e.printStackTrace();
@@ -39,7 +35,7 @@ public class TestServerFilter implements Filter {
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         try {
-            long d = System.currentTimeMillis() - queue.take();
+            long d = System.currentTimeMillis() - Access.msgQueue.take();
             Access.msgCounter.add(d);
 //            System.out.println(d);
         } catch (InterruptedException e) {
