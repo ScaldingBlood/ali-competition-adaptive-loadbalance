@@ -53,11 +53,11 @@ public class Status {
     }
 
     public void acquire() {
-        left.incrementAndGet();
+        left.decrementAndGet();
     }
 
     public void release() {
-        left.decrementAndGet();
+        left.incrementAndGet();
     }
 
     public void notify(double duration) {
