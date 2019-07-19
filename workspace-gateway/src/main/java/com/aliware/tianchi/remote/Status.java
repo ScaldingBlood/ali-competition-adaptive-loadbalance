@@ -1,5 +1,7 @@
 package com.aliware.tianchi.remote;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.aliware.tianchi.util.ScalableSemaphore;
 
 public class Status {
@@ -7,7 +9,7 @@ public class Status {
 
     private int sum;
     private int maxNum;
-    private ScalableSemaphore left;
+    private AtomicInteger left;
 
     private volatile double curDuration = 0;
 
@@ -21,13 +23,13 @@ public class Status {
         maxNum = Access.maxAvailableThreads.get(name);
         System.out.println(name + maxNum);
         sum = (int)(Math.ceil(maxNum / 1300.0 * 1024));
-        left = new ScalableSemaphore(sum -1);
+        left = new AtomicInteger(sum -1);
     }
 
     public synchronized boolean increaseSize(int size) {
         if(size + sum <= maxNum) {
             sum += size;
-            left.increasePermits(size);
+            left.addAndGet(size);
             return true;
         }
         return false;
@@ -36,14 +38,14 @@ public class Status {
     public synchronized boolean decreaseSize(int size) {
         if(sum - size > 20) {
             sum -= size;
-            left.reducePermitsInternal(size);
+            left.addAndGet(-size);
             return true;
         }
         return false;
     }
 
     public int getAvailableCnt() {
-        return left.availablePermits();
+        return left.get();
     }
 
     public int getSum() {
@@ -51,15 +53,11 @@ public class Status {
     }
 
     public void acquire() {
-        try {
-            left.acquire();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        left.incrementAndGet();
     }
 
     public void release() {
-        left.release();
+        left.decrementAndGet();
     }
 
     public void notify(double duration) {
