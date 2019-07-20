@@ -7,9 +7,12 @@ import com.aliware.tianchi.util.ScalableSemaphore;
 public class Status {
     public static final int DELTA_SIZE = 10;
 
-    private int sum;
+    private AtomicInteger sum;
     private int maxNum;
+    private int upperBound;
+    private int lowerBound;
     private AtomicInteger left;
+    private StateEnum state;
 
     private volatile double curDuration = 0;
 
@@ -22,42 +25,54 @@ public class Status {
     public void init() {
         maxNum = Access.maxAvailableThreads.get(name);
         System.out.println(name + maxNum);
-        sum = (int)(Math.ceil(maxNum / 1300.0 * 1024));
-        left = new AtomicInteger(sum -1);
+        upperBound = (int)(maxNum * 0.86);
+        lowerBound = (int)(maxNum * 0.7);
+        sum = new AtomicInteger();
+//        left = new AtomicInteger(sum -1);
+        state = StateEnum.HUNGRY;
     }
+//
+//    public synchronized boolean increaseSize(int size) {
+//        if(size + sum <= maxNum) {
+//            sum += size;
+//            left.addAndGet(size);
+//            if(sum > upperBound)
+//                state = StateEnum.LIMIT;
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    public synchronized boolean decreaseSize(int size) {
+//        if(sum - size > 20) {
+//            sum -= size;
+//            left.addAndGet(-size);
+//            if(sum < lowerBound)
+//                state = StateEnum.HUNGRY;
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    public int getAvailableCnt() {
+//        return left.get();
+//    }
 
-    public synchronized boolean increaseSize(int size) {
-        if(size + sum <= maxNum) {
-            sum += size;
-            left.addAndGet(size);
-            return true;
-        }
-        return false;
-    }
-
-    public synchronized boolean decreaseSize(int size) {
-        if(sum - size > 20) {
-            sum -= size;
-            left.addAndGet(-size);
-            return true;
-        }
-        return false;
-    }
-
-    public int getAvailableCnt() {
-        return left.get();
-    }
-
-    public int getSum() {
-        return sum;
+    public int getLeft() {
+        return maxNum - sum.get();
     }
 
     public void acquire() {
-        left.decrementAndGet();
+//        left.decrementAndGet();
+        while(sum.get() >= maxNum);
+        sum.incrementAndGet();
+        check();
     }
 
     public void release() {
-        left.incrementAndGet();
+//        left.incrementAndGet();
+        sum.decrementAndGet();
+        check();
     }
 
     public void notify(double duration) {
@@ -66,5 +81,22 @@ public class Status {
 
     public double getCurDuration() {
         return curDuration;
+    }
+
+    public void check() {
+        if(sum.get() > upperBound)
+            state = StateEnum.LIMIT;
+        else if(sum.get() < lowerBound)
+            state = StateEnum.HUNGRY;
+        else
+            state = StateEnum.NORMAL;
+    }
+
+    public StateEnum getState() {
+        return state;
+    }
+
+    public String getName() {
+        return name;
     }
 }
