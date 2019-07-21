@@ -18,19 +18,23 @@ public class MsgCounter {
             int batchSize = 20;
             while(true) {
                 try {
+                    if(cnt++ < batchSize) {
+                        durations.take();
+                        continue;
+                    }
                     avg += durations.take();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if(cnt++ == batchSize) {
+                if(cnt == batchSize * 2.1) {
 //                    double median = findK(arr, 0, BATCH_SIZE-1, BATCH_SIZE/2 + 1);
-                    avg /= batchSize;
+                    avg /= (batchSize * 1.1);
                     String msg = quota + " " + avg;
 //                    System.out.println(msg);
                     Access.listener.receiveServerMsg(msg);
                     cnt = 0;
                     avg = 0;
-                    batchSize = Access.msgQueue.size() * 2 + 10;
+                    batchSize = Access.msgQueue.size();
                 }
             }
         }).start();
