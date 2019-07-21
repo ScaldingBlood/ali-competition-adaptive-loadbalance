@@ -25,34 +25,28 @@ public class Status {
     public void init() {
         maxNum = Access.maxAvailableThreads.get(name);
         System.out.println(name + maxNum);
-        upperBound = (int)(maxNum * 0.86);
-        lowerBound = (int)(maxNum * 0.7);
+        upperBound = (int)(maxNum * 0.8);
+        lowerBound = (int)(maxNum * 0.4);
         sum = new AtomicInteger();
 //        left = new AtomicInteger(sum -1);
         state = StateEnum.HUNGRY;
     }
-//
-//    public synchronized boolean increaseSize(int size) {
-//        if(size + sum <= maxNum) {
-//            sum += size;
-//            left.addAndGet(size);
-//            if(sum > upperBound)
-//                state = StateEnum.LIMIT;
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//    public synchronized boolean decreaseSize(int size) {
-//        if(sum - size > 20) {
-//            sum -= size;
-//            left.addAndGet(-size);
-//            if(sum < lowerBound)
-//                state = StateEnum.HUNGRY;
-//            return true;
-//        }
-//        return false;
-//    }
+
+    public synchronized boolean increaseSize() {
+        if(upperBound + 0.06 * maxNum <= maxNum) {
+            upperBound += (0.06 * maxNum);
+            return true;
+        }
+        return false;
+    }
+
+    public synchronized boolean decreaseSize() {
+        if(upperBound - 0.06 * maxNum > lowerBound) {
+            upperBound -= (0.06 * maxNum);
+            return true;
+        }
+        return false;
+    }
 //
 //    public int getAvailableCnt() {
 //        return left.get();
@@ -78,6 +72,11 @@ public class Status {
     }
 
     public void notify(double duration) {
+//        if(state.compareTo(StateEnum.LIMIT) == 0)
+//            if(duration <= curDuration * 1.1)
+//                increaseSize();
+//            else if(duration >= curDuration * 1.7)
+//                decreaseSize();
         curDuration = duration;
     }
 
@@ -100,5 +99,9 @@ public class Status {
 
     public String getName() {
         return name;
+    }
+
+    public int getUpperBound() {
+        return upperBound;
     }
 }

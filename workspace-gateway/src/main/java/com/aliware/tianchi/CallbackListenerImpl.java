@@ -14,7 +14,7 @@ import org.apache.dubbo.rpc.listener.CallbackListener;
  *
  */
 public class CallbackListenerImpl implements CallbackListener {
-//    private Balancer balancer = new Balancer();
+    private Balancer balancer = new Balancer();
 
     @Override
     public void receiveServerMsg(String msg) {
@@ -26,7 +26,7 @@ public class CallbackListenerImpl implements CallbackListener {
 //            else
             Access.providerMap.get(strs[0]).notify(duration);
 //            Access.queue.sort();
-//            balancer.balance(strs[0], duration);
+            balancer.balance(strs[0], duration);
         }
         else
             Access.maxAvailableThreads.put(strs[0], Integer.valueOf(strs[1]));

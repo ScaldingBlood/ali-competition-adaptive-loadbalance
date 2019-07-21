@@ -50,10 +50,12 @@ public class InvokerQueue {
                 target = i;
                 targetState = tmpState;
                 targetDuration = s.getCurDuration();
-            } else if(tmpState.compareTo(targetState) == 0) {
+            }
+            else if(tmpState.compareTo(targetState) == 0) {
                 if(tmpState.compareTo(StateEnum.LIMIT) == 0) {
-                    target = targetStatus.getLeft() > s.getLeft() ? target : i;
-                } else if(tmpDuration < targetDuration) {
+                    target = ThreadLocalRandom.current().nextInt(i + 1);
+                } else
+                if(tmpDuration < targetDuration) {
                     target = i;
                     targetDuration = tmpDuration;
                 }
