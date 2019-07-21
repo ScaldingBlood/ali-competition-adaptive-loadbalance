@@ -33,14 +33,18 @@ public class InvokerQueue {
 //        }
 //    }
 
-    public String acquire() {
+    public int getTarget() {
         int target = 0;
         Status targetStatus = list.get(0);
         StateEnum targetState = targetStatus.getState();
+        if(targetState.compareTo(StateEnum.HUNGRY) == 0)
+            return target;
         double targetDuration = targetStatus.getCurDuration();
         for(int i = 1; i < 3; i++) {
             Status s = list.get(i);
             StateEnum tmpState = s.getState();
+            if(tmpState.compareTo(StateEnum.HUNGRY) == 0)
+                return i;
             double tmpDuration = s.getCurDuration();
             if(tmpState.compareTo(targetState) < 0) {
                 target = i;
@@ -55,7 +59,14 @@ public class InvokerQueue {
                 }
             }
         }
-        list.get(target).acquire();
-        return providers[target];
+        return target;
+    }
+
+    public String acquire() {
+        int target = getTarget();
+        if(list.get(target).acquire())
+            return providers[target];
+        else
+            return acquire();
     }
 }
