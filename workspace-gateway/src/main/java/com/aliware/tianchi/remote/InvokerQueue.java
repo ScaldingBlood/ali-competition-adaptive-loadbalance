@@ -21,6 +21,7 @@ public class InvokerQueue {
         for(Status s : providerMap.values())
             s.init();
         Access.providerMap = providerMap;
+        judge();
     }
 
 //    public void sort() {
@@ -33,7 +34,7 @@ public class InvokerQueue {
 //        }
 //    }
 
-    private int target;
+    private int target = 0;
 
     public void judge() {
         new Thread(() -> {
@@ -64,7 +65,6 @@ public class InvokerQueue {
 
 
     public String acquire() {
-        judge();
         list.get(target).acquire();
         return providers[target];
     }
