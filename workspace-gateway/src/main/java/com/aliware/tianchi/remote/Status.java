@@ -35,6 +35,7 @@ public class Status {
     public synchronized boolean increaseSize() {
         if(upperBound + 0.06 * maxNum <= maxNum) {
             upperBound += (0.06 * maxNum);
+            check();
             return true;
         }
         return false;
@@ -43,6 +44,7 @@ public class Status {
     public synchronized boolean decreaseSize() {
         if(upperBound - 0.06 * maxNum > lowerBound) {
             upperBound -= (0.06 * maxNum);
+            check();
             return true;
         }
         return false;

@@ -20,7 +20,7 @@ public class Balancer {
     public void balance(String p, double duration) {
         if(Access.providerMap.get(p).getState().compareTo(StateEnum.LIMIT) != 0)
             return;
-        durations.put(p, duration);
+        durations.put(p, 0.3 * durations.getOrDefault(p, 0.0) + 0.7 * duration);
         set.add(p);
         System.out.println("balance " + p);
 
