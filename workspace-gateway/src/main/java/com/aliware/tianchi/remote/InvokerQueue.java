@@ -37,14 +37,10 @@ public class InvokerQueue {
         int target = 0;
         Status targetStatus = list.get(0);
         StateEnum targetState = targetStatus.getState();
-        if(targetState.compareTo(StateEnum.HUNGRY) == 0)
-            return target;
         double targetDuration = targetStatus.getCurDuration();
         for(int i = 1; i < 3; i++) {
             Status s = list.get(i);
             StateEnum tmpState = s.getState();
-            if(tmpState.compareTo(StateEnum.HUNGRY) == 0)
-                return i;
             double tmpDuration = s.getCurDuration();
             if(tmpState.compareTo(targetState) < 0) {
                 target = i;

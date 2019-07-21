@@ -62,15 +62,17 @@ public class Status {
 //        left.decrementAndGet();
     if (sum.get() >= maxNum)
         return false;
-        sum.incrementAndGet();
-        check();
+        int tmp = sum.incrementAndGet();
+        if(tmp == lowerBound || tmp == upperBound)
+            check();
         return true;
     }
 
     public void release() {
 //        left.incrementAndGet();
-        sum.decrementAndGet();
-        check();
+        int tmp = sum.decrementAndGet();
+        if(tmp == lowerBound || tmp == upperBound)
+            check();
     }
 
     public void notify(double duration) {

@@ -20,18 +20,18 @@ public class Balancer {
     public void balance(String p, double duration) {
         if(Access.providerMap.get(p).getState().compareTo(StateEnum.LIMIT) != 0)
             return;
-        durations.put(p, 0.3 * durations.getOrDefault(p, 0.0) + 0.7 * duration);
+        durations.put(p, duration);
         set.add(p);
-        System.out.println("balance " + p);
+//        System.out.println("balance " + p);
 
         if(set.size() == 3) {
             enlarge();
             restrict();
             set.clear();
-            for(Map.Entry<String, Status> entry : Access.providerMap.entrySet()) {
-                System.out.print(entry.getKey() + " " + entry.getValue().getUpperBound());
-            }
-            System.out.println();
+//            for(Map.Entry<String, Status> entry : Access.providerMap.entrySet()) {
+//                System.out.print(entry.getKey() + " " + entry.getValue().getUpperBound());
+//            }
+//            System.out.println();
         }
     }
 
