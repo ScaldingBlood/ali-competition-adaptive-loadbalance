@@ -33,28 +33,38 @@ public class InvokerQueue {
 //        }
 //    }
 
-    public String acquire() {
-        int target = 0;
-        Status targetStatus = list.get(0);
-        StateEnum targetState = targetStatus.getState();
-        double targetDuration = targetStatus.getCurDuration();
-        for(int i = 1; i < 3; i++) {
-            Status s = list.get(i);
-            StateEnum tmpState = s.getState();
-            double tmpDuration = s.getCurDuration();
-            if(tmpState.compareTo(targetState) < 0) {
-                target = i;
-                targetState = tmpState;
-                targetDuration = s.getCurDuration();
-            } else if(tmpState.compareTo(targetState) == 0) {
-                if(tmpState.compareTo(StateEnum.LIMIT) == 0) {
-                    target = targetStatus.getLeft() > s.getLeft() ? target : i;
-                } else if(tmpDuration < targetDuration) {
-                    target = i;
-                    targetDuration = tmpDuration;
+    private int target;
+
+    public void judge() {
+        new Thread(() -> {
+            while(true) {
+                Status targetStatus = list.get(0);
+                StateEnum targetState = targetStatus.getState();
+                double targetDuration = targetStatus.getCurDuration();
+                for (int i = 1; i < 3; i++) {
+                    Status s = list.get(i);
+                    StateEnum tmpState = s.getState();
+                    double tmpDuration = s.getCurDuration();
+                    if (tmpState.compareTo(targetState) < 0) {
+                        target = i;
+                        targetState = tmpState;
+                        targetDuration = s.getCurDuration();
+                    } else if (tmpState.compareTo(targetState) == 0) {
+                        if (tmpState.compareTo(StateEnum.LIMIT) == 0) {
+                            target = targetStatus.getLeft() > s.getLeft() ? target : i;
+                        } else if (tmpDuration < targetDuration) {
+                            target = i;
+                            targetDuration = tmpDuration;
+                        }
+                    }
                 }
             }
-        }
+        }).start();
+    }
+
+
+    public String acquire() {
+        judge();
         list.get(target).acquire();
         return providers[target];
     }
