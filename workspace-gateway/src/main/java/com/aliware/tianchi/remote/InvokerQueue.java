@@ -1,11 +1,15 @@
 package com.aliware.tianchi.remote;
 
+import java.lang.annotation.Target;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class InvokerQueue {
+    private static final int ACQUIRE_SIZE = 4;
+
     private List<Status> list = new ArrayList<>();
     private String[] providers = new String[] {"medium", "large", "small"};
 
@@ -33,39 +37,39 @@ public class InvokerQueue {
 //            lock.unlock();
 //        }
 //    }
-
-    private int target = 0;
-
-    public void judge() {
-        new Thread(() -> {
-            while(true) {
-                Status targetStatus = list.get(0);
-                StateEnum targetState = targetStatus.getState();
-                double targetDuration = targetStatus.getCurDuration();
-                for (int i = 1; i < 3; i++) {
-                    Status s = list.get(i);
-                    StateEnum tmpState = s.getState();
-                    double tmpDuration = s.getCurDuration();
-                    if (tmpState.compareTo(targetState) < 0) {
-                        target = i;
-                        targetState = tmpState;
-                        targetDuration = s.getCurDuration();
-                    } else if (tmpState.compareTo(targetState) == 0) {
-                        if (tmpState.compareTo(StateEnum.LIMIT) == 0) {
-                            target = targetStatus.getLeft() > s.getLeft() ? target : i;
-                        } else if (tmpDuration < targetDuration) {
-                            target = i;
-                            targetDuration = tmpDuration;
-                        }
-                    }
+    private AtomicInteger cnt = new AtomicInteger();
+    private volatile int target = 0;
+    public int judge() {
+        if((cnt.getAndIncrement() & (ACQUIRE_SIZE-1)) != 0) {
+            return target;
+        }
+        Status targetStatus = list.get(0);
+        StateEnum targetState = targetStatus.getState();
+        double targetDuration = targetStatus.getCurDuration();
+        for (int i = 1; i < 3; i++) {
+            Status s = list.get(i);
+            StateEnum tmpState = s.getState();
+            double tmpDuration = s.getCurDuration();
+            if (tmpState.compareTo(targetState) < 0) {
+                target = i;
+                targetState = tmpState;
+                targetDuration = s.getCurDuration();
+            } else if (tmpState.compareTo(targetState) == 0) {
+                if (tmpState.compareTo(StateEnum.LIMIT) == 0) {
+                    target = targetStatus.getLeft() > s.getLeft() ? target : i;
+                } else if (tmpDuration < targetDuration) {
+                    target = i;
+                    targetDuration = tmpDuration;
                 }
             }
-        }).start();
+        }
+        list.get(target).acquire(ACQUIRE_SIZE);
+        return target;
     }
 
 
     public String acquire() {
-        list.get(target).acquire();
+        int target = judge();
         return providers[target];
     }
 }

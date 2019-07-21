@@ -62,10 +62,10 @@ public class Status {
         return maxNum - sum.get();
     }
 
-    public void acquire() {
+    public void acquire(int n) {
 //        left.decrementAndGet();
-        while(sum.get() >= maxNum);
-        sum.incrementAndGet();
+        while(sum.get() + n >= maxNum);
+        sum.addAndGet(n);
         check();
     }
 
